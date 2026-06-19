@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.romin.task.dto.response.ApiResponse;
 import com.romin.task.dto.response.ErrorResponse;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.romin.task")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)

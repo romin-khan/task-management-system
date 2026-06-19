@@ -3,13 +3,18 @@ package com.romin.task.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.romin.user.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
@@ -33,11 +38,21 @@ public class Task{
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    @Column(nullable = false)
-    private String assignedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "assigned_by_id",
+        nullable = false,
+        referencedColumnName = "id"
+    )
+    private User assignedBy;
 
-    @Column(nullable = false)
-    private String assignedTo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "assigned_to_id",
+        nullable = false,
+        referencedColumnName = "id"
+    )
+    private User assignedTo;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -56,8 +71,8 @@ public class Task{
 
      public Task(String title,
                 String description,
-                String assignedBy,
-                String assignedTo,
+                User assignedBy,
+                User assignedTo,
                 LocalDate dueDate) {
         this.title = title;
         this.description = description;
@@ -82,11 +97,11 @@ public class Task{
         return status;
     }
 
-    public String getAssignedBy() {
+    public User getAssignedBy() {
         return assignedBy;
     }
 
-    public String getAssignedTo() {
+    public User getAssignedTo() {
         return assignedTo;
     }
 
@@ -108,7 +123,7 @@ public class Task{
     }
 
     public void extendDueDate(LocalDate extendedDueDate, TaskStatus status){
-        if(!dueDate.isAfter(extendedDueDate)){
+        if(dueDate.isAfter(extendedDueDate)){
             throw new IllegalArgumentException("Extended due date should be after privious date");
         }
         if(status == TaskStatus.IS_COMPLETED){

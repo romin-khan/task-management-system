@@ -140,4 +140,14 @@ public class User {
         fetch = FetchType.LAZY
     )
     private List<User> managedEmployee = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "assignedBy",
+        fetch = FetchType.LAZY,
+        cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+        }
+    )
+    private List<Task> assignedTaskByMe = new ArrayList<>();
 }
