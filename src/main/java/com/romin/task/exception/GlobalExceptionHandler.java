@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
                     .body(
                         buildResponse(
                             error,
-                            HttpStatus.NOT_FOUND.value()
+                            HttpStatus.BAD_REQUEST.value()
                         )
                     );                                        
     }
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
                     .body(
                         buildResponse(
                             error,
-                            HttpStatus.NOT_FOUND.value()
+                            HttpStatus.CONFLICT.value()
                         )
                     );                                        
     }
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
                     .body(
                         buildResponse(
                             error,
-                            HttpStatus.NOT_FOUND.value()
+                            HttpStatus.BAD_REQUEST.value()
                         )
                     );        
     }
