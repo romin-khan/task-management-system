@@ -17,21 +17,39 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
+@Getter
 @Entity
 @Table(name = "tasks")
 public class Task{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "task_id_generator"
+    )
+    @SequenceGenerator(
+        name = "task_id_generator",
+        sequenceName = "task_generator",
+        initialValue = 1,
+        allocationSize = 1
+    )
     private Long id;
 
+    @NonNull
     @Column(nullable = false, length = 100)
     private String title;
 
+    @NonNull
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -39,6 +57,7 @@ public class Task{
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "assigned_by_id",
@@ -48,6 +67,7 @@ public class Task{
     )
     private User assignedBy;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "assigned_to_id",
@@ -63,6 +83,7 @@ public class Task{
     @Column(nullable = true)
     private LocalDateTime completionDate;
 
+    @NonNull
     @Column(nullable = false)
     private LocalDate dueDate;
 
@@ -72,54 +93,6 @@ public class Task{
         this.status = TaskStatus.NOT_STARTED;
     }
 
-     public Task(String title,
-                String description,
-                User assignedBy,
-                User assignedTo,
-                LocalDate dueDate) {
-        this.title = title;
-        this.description = description;
-        this.assignedBy = assignedBy;
-        this.assignedTo = assignedTo;
-        this.dueDate = dueDate; 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public User getAssignedBy() {
-        return assignedBy;
-    }
-
-    public User getAssignedTo() {
-        return assignedTo;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getCompletionDate() {
-        return completionDate;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
     public void markAsCompleted(){
         this.completionDate = LocalDateTime.now();
         this.status=TaskStatus.IS_COMPLETED;
@@ -127,7 +100,7 @@ public class Task{
 
     public void extendDueDate(LocalDate extendedDueDate, TaskStatus status){
         if(dueDate.isAfter(extendedDueDate)){
-            throw new IllegalArgumentException("Extended due date should be after privious date");
+            throw new IllegalArgumentException("Extended due date should be after previous date");
         }
         if(status == TaskStatus.IS_COMPLETED){
             throw new IllegalStateException("Doesn't need to extend due date because task is completed");

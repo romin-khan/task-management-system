@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -88,6 +89,21 @@ public class GlobalExceptionHandler {
                             HttpStatus.BAD_REQUEST.value()
                         )
                     );        
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleDataBaseVoilationException(DataIntegrityViolationException ex){
+        ErrorResponse error = ErrorResponse.builder()
+                                           .detail("Data conflict: A resource with these unique identifiers already exists, or required fields are missing.")
+                                           .build();
+        return ResponseEntity
+                     .status(HttpStatus.CONFLICT)
+                     .body(
+                        buildResponse(
+                            error,
+                            HttpStatus.CONFLICT.value()
+                        )
+                     );
     }
 
     private ApiResponse<ErrorResponse> buildResponse(ErrorResponse error, int status){
