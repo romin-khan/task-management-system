@@ -24,7 +24,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.ForeignKey;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(
     name = "users",
@@ -139,6 +144,7 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "manager_id",
+        foreignKey = @ForeignKey(name = "fk_user_manager"),
         referencedColumnName = "id"
     )
     private User manager;

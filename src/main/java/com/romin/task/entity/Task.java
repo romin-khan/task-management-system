@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,6 +43,7 @@ public class Task{
     @JoinColumn(
         name = "assigned_by_id",
         nullable = false,
+        foreignKey = @ForeignKey(name = "fk_tasks_assigned_by_user"),
         referencedColumnName = "id"
     )
     private User assignedBy;
@@ -50,6 +52,7 @@ public class Task{
     @JoinColumn(
         name = "assigned_to_id",
         nullable = false,
+        foreignKey = @ForeignKey(name = "fk_tasks_assigned_to_user"),
         referencedColumnName = "id"
     )
     private User assignedTo;

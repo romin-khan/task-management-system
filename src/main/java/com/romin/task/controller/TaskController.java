@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.romin.task.dto.request.DescriptioRequest;
+import com.romin.task.dto.request.DescriptionRequest;
 import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
 import com.romin.task.dto.response.ApiResponse;
@@ -63,7 +63,7 @@ public class TaskController {
     @PatchMapping("/{id}/updateDescription")
     public ResponseEntity<ApiResponse<TaskResponseDto>> updateDescription(
                                                 @PathVariable Long id,
-                                                @Valid @RequestBody DescriptioRequest request
+                                                @Valid @RequestBody DescriptionRequest request
                                             ){
         ServiceResult<TaskResponseDto> result = taskService.updateDescription(
                                                                 request,

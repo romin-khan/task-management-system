@@ -15,8 +15,8 @@ public class TaskResponseDto {
     private final String title;
     private final String description;
     private final TaskStatus status;
-    private final String assignedBy;
-    private final String assignedTo;
+    private final Long assignedBy;
+    private final Long assignedTo;
     private final LocalDateTime createdAt;
     private final LocalDate dueDate;
     private final LocalDateTime completionDate;

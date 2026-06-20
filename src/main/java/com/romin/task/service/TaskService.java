@@ -1,5 +1,6 @@
 package com.romin.task.service;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import com.romin.task.dto.request.DescriptionRequest;
@@ -10,32 +11,47 @@ import com.romin.task.entity.Task;
 import com.romin.task.entity.TaskStatus;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.romin.task.exception.TaskNotFoundException;
-import com.romin.task.repository.Taskrepo;
+import com.romin.task.repository.TaskRepo;
 import com.romin.user.entity.User;
-import com.romin.user.repository.Userrepo;
+import com.romin.user.repository.UserRepo;
 
 @Service
+@Transactional
 public class TaskService {
 
-    private final Taskrepo taskrepo;
-    private final Userrepo userrepo;
+    private final TaskRepo taskRepo;
+    private final UserRepo userRepo;
 
-    public TaskService(Taskrepo taskrepo, Userrepo userrepo){
-        this.taskrepo = taskrepo;
-        this.userrepo = userrepo;
+    public TaskService(TaskRepo taskRepo, UserRepo userRepo){
+        this.taskRepo = taskRepo;
+        this.userRepo = userRepo;
     }
 
+    @SuppressWarnings("null")
     public ServiceResult<TaskResponseDto> createTask(TaskRequestDto request){
 
-        User assignedBy = ;
+        Long authorId = request.getAssignedBy();
+        Long targetId = request.getAssignedTo();
+
+        User assignedBy = userRepo.findById(authorId)
+                                        .orElseThrow(
+                                            () -> new InvalidParameterException("User not found of id "+authorId)
+                                        );
+        User assignedTo = userRepo.findById(targetId)
+                                        .orElseThrow(
+                                            () -> new InvalidParameterException("User not found of id "+targetId) 
+                                        );
+
 
         Task task = new Task(request.getTitle(),
                              request.getDescription(),
                              assignedBy,
-                             request.getassignedTo(),
+                             assignedTo,
                              request.getDueDate());
-        repo.save(task);
+        taskRepo.save(task);
 
         return new ServiceResult<>(
             "Task is created successsfully",
@@ -45,8 +61,8 @@ public class TaskService {
 
     @SuppressWarnings("null")
     public ServiceResult<Object> deleteTask(Long id){
-        getTaskOrThrow(id);
-        repo.deleteById(id);
+        Task task = getTaskOrThrow(id);
+        taskRepo.delete(task);
         return new ServiceResult<>(
                         "Task deleted Successfully",
                         null
@@ -58,7 +74,7 @@ public class TaskService {
         Task task = getTaskOrThrow(id);
         task.updateDescription(request.getDescription());
 
-        repo.save(task);
+        taskRepo.save(task);
 
         return new ServiceResult<>(
                         "Description updated succesfully",
@@ -81,7 +97,7 @@ public class TaskService {
         Task task = getTaskOrThrow(id);
         task.cancelTask();
 
-        repo.save(task);
+        taskRepo.save(task);
 
         return new ServiceResult<>(
                         "Task is cancelled",
@@ -101,24 +117,25 @@ public class TaskService {
 
     public ServiceResult<TaskResponseDto> completeTask(Long id){
         Task task = getTaskOrThrow(id);
-        TaskStatus priviousStatus = task.completeTask();
+        TaskStatus previousStatus = task.completeTask();
 
         String message;
 
-        if(priviousStatus == TaskStatus.CANCELLED){
+        if(previousStatus == TaskStatus.CANCELLED){
             message = "The task is cancelled, but now it is marked as completed";
-        }else if(priviousStatus == TaskStatus.NOT_STARTED){
+        }else if(previousStatus == TaskStatus.NOT_STARTED){
             message = "the task  is not started yet, but now marked as completed";
         }else{
             message = "the task is marked completed";
         }
-        repo.save(task);
+        taskRepo.save(task);
         return new ServiceResult<>(
                        message,
                        mapToDto(task)
                    );
     }
-
+    
+    @Transactional(readOnly = true)
     public ServiceResult<TaskResponseDto> getTaskById(Long id){
         Task task = getTaskOrThrow(id);
         return new ServiceResult<>(
@@ -126,11 +143,12 @@ public class TaskService {
                         mapToDto(task)
                     );
     }
-
+    
+    @Transactional(readOnly = true)
     public ServiceResult<List<TaskResponseDto>> getAllTask(){
         return new ServiceResult<>(
                         "Tasks fetched successfully",
-                        repo.findAll()
+                        taskRepo.findAll()
                             .stream()
                             .map(this::mapToDto)
                             .toList()
@@ -141,7 +159,7 @@ public class TaskService {
         if (id == null) {
             throw new TaskNotFoundException("Task cannot be found because the provided ID is null");
         }
-        return repo.findById(id)
+        return taskRepo.findById(id)
                    .orElseThrow(
                        () -> new TaskNotFoundException("Task having id = "+id+" not found")
                    );
@@ -153,8 +171,8 @@ public class TaskService {
                                 .title(task.getTitle())
                                 .description(task.getDescription())
                                 .status(task.getStatus())
-                                .assignedBy(task.getAssignedBy())
-                                .assignedTo(task.getAssignedTo())
+                                .assignedBy(task.getAssignedBy().getId())
+                                .assignedTo(task.getAssignedTo().getId())
                                 .createdAt(task.getCreatedAt())
                                 .dueDate(task.getDueDate())
                                 .completionDate(task.getCompletionDate())

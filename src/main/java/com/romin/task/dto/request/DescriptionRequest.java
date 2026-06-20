@@ -2,7 +2,7 @@ package com.romin.task.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class DescriptioRequest{
+public class DescriptionRequest{
 
     @NotBlank(message = "Description should not be blank")
     private String description;
