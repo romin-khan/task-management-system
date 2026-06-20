@@ -12,6 +12,8 @@ import com.romin.user.enums.Status;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -82,6 +84,7 @@ public class User {
         nullable = false,
         length = 30
     )
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(
@@ -89,6 +92,7 @@ public class User {
         nullable = false,
         length = 50
     )
+    @Enumerated(EnumType.STRING)
     private Position position;
 
     @Column(
@@ -96,6 +100,7 @@ public class User {
         nullable = false,
         length = 20
     )
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(
@@ -114,7 +119,10 @@ public class User {
 
     @OneToMany(
         mappedBy = "assignedTo",
-        cascade = CascadeType.ALL,
+        cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+        },
         fetch = FetchType.LAZY
     )
     private List<Task> tasksAssigned = new ArrayList<>();
@@ -139,7 +147,7 @@ public class User {
         mappedBy = "manager",
         fetch = FetchType.LAZY
     )
-    private List<User> managedEmployee = new ArrayList<>();
+    private List<User> subordinates = new ArrayList<>();
 
     @OneToMany(
         mappedBy = "assignedBy",

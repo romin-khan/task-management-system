@@ -2,7 +2,7 @@ package com.romin.task.service;
 
 import java.util.List;
 
-import com.romin.task.dto.request.DescriptioRequest;
+import com.romin.task.dto.request.DescriptionRequest;
 import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
@@ -11,20 +11,24 @@ import com.romin.task.entity.TaskStatus;
 
 import org.springframework.stereotype.Service;
 import com.romin.task.exception.TaskNotFoundException;
-import com.romin.task.repository.TaskRepo;
+import com.romin.task.repository.Taskrepo;
+import com.romin.user.entity.User;
+import com.romin.user.repository.Userrepo;
 
 @Service
 public class TaskService {
 
-    private final TaskRepo repo;
+    private final Taskrepo taskrepo;
+    private final Userrepo userrepo;
 
-    public TaskService(TaskRepo repo){
-        this.repo = repo;
+    public TaskService(Taskrepo taskrepo, Userrepo userrepo){
+        this.taskrepo = taskrepo;
+        this.userrepo = userrepo;
     }
 
     public ServiceResult<TaskResponseDto> createTask(TaskRequestDto request){
 
-        String assignedBy = "SYSTEM_USER";
+        User assignedBy = ;
 
         Task task = new Task(request.getTitle(),
                              request.getDescription(),
@@ -39,7 +43,7 @@ public class TaskService {
         );
     }
 
-    
+    @SuppressWarnings("null")
     public ServiceResult<Object> deleteTask(Long id){
         getTaskOrThrow(id);
         repo.deleteById(id);
@@ -49,7 +53,7 @@ public class TaskService {
                     );
     }
 
-    public ServiceResult<TaskResponseDto> updateDescription(DescriptioRequest request, 
+    public ServiceResult<TaskResponseDto> updateDescription(DescriptionRequest request, 
                                              Long id){
         Task task = getTaskOrThrow(id);
         task.updateDescription(request.getDescription());
@@ -134,6 +138,9 @@ public class TaskService {
     }
 
     private Task getTaskOrThrow(Long id){
+        if (id == null) {
+            throw new TaskNotFoundException("Task cannot be found because the provided ID is null");
+        }
         return repo.findById(id)
                    .orElseThrow(
                        () -> new TaskNotFoundException("Task having id = "+id+" not found")
