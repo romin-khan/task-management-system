@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.romin.infra.payload.ApiResponse;
 import com.romin.task.dto.request.DescriptionRequest;
 import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
-import com.romin.task.dto.response.ApiResponse;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.service.ServiceResult;
 import com.romin.task.service.TaskService;

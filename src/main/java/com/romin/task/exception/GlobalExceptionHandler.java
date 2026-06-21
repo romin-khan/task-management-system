@@ -9,20 +9,22 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.romin.task.dto.response.ApiResponse;
-import com.romin.task.dto.response.ErrorResponse;
+import com.romin.infra.payload.ApiResponse;
+import com.romin.infra.payload.ErrorResponse;
 
 @RestControllerAdvice(basePackages = "com.romin.task")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleTaskNotFound(TaskNotFoundException ex){
+        String message = String.format(ex.getMessage()+"that");
         ErrorResponse error = ErrorResponse.builder()
-                                           .detail(ex.getMessage())
+                                           .detail(message)
                                            .build();
         return ResponseEntity
                .status(HttpStatus.NOT_FOUND)
@@ -36,8 +38,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalArgument(IllegalArgumentException ex){
+        String message = String.format(ex.getMessage()+"this");
         ErrorResponse error = ErrorResponse.builder()
-                                           .detail(ex.getMessage())
+                                           .detail(message)
                                            .build();
         return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -51,8 +54,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalState(IllegalStateException ex){
+        String message = String.format(ex.getMessage()+"then");
         ErrorResponse error = ErrorResponse.builder()
-                                           .detail(ex.getMessage())
+                                           .detail(message)
                                            .build();
         return ResponseEntity
                     .status(HttpStatus.CONFLICT)
