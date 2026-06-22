@@ -1,18 +1,16 @@
 package com.romin.infra.exception;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import com.romin.infra.payload.ApiResponse;
-import com.romin.infra.payload.ErrorResponse;
 
 import org.springframework.lang.Nullable;
 
@@ -28,51 +26,48 @@ public class CoreGlobalExceptionHandeller extends ResponseEntityExceptionHandler
             @NonNull WebRequest request) {
 
         String message;
-        String errorType;
+        String title;
+        String errorCode;
 
-        if(statusCode.value() == 400){
-            errorType = "Invalid Submission";
+        if(statusCode.equals(HttpStatus.BAD_REQUEST)){
+            title = "Invalid Submission";
             message = "We couldn't process your information because some data was formatted incorrectly. Please check your inputs.";
+            errorCode = "ERR_API_BAD_REQUEST";
         }
-        else if(statusCode.value() == 404){
-            errorType = "Route Not Found";
+        else if(statusCode.equals(HttpStatus.NOT_FOUND)){
+            title = "Route Not Found";
             message = "The page or feature you are trying to reach doesn't seem to exist. Please verify the URL.";
+            errorCode = "ERR_API_ROUTE_NOT_FOUND";
         }
-        else if(statusCode.value() == 405){
-            errorType = "Action Not Allowed";
+        else if(statusCode.equals(HttpStatus.METHOD_NOT_ALLOWED)){
+            title = "Action Not Allowed";
             message = "The action you are trying to perform is not supported by this screen. Please refresh and try again.";
+            errorCode = "ERR_API_ROUTE_NOT_FOUND";
         }
-        else if(statusCode.value() == 415){
-            errorType = "Unsupported Media Type";
+        else if(statusCode.equals(HttpStatus.UNSUPPORTED_MEDIA_TYPE)){
+            title = "Unsupported Media Type";
             message = "we only support data in form of JSON";
+            errorCode = "ERR_API_UNSUPPORTED_MEDIA";
         }else{
             HttpStatus status = HttpStatus.resolve(statusCode.value());
-            errorType = (status != null) ? status.getReasonPhrase() : "Routing Error";
+            title = (status != null) ? status.getReasonPhrase() : "Routing Error";
             message = "Somthing went wrong on our end while processing your request. please try again shortly.";
+            errorCode = "ERR_API_WEB_FRAMEWORK_FAILURE";
         }
 
-        ErrorResponse error = ErrorResponse.builder()
-                .detail(message)
-                .build();
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(statusCode, message);
+        problemDetail.setTitle(title);
+
+        problemDetail.setProperty("errorCode", errorCode);
+        problemDetail.setProperty("timestamp", Instant.now());
+        
+        if(statusCode.is4xxClientError()){
+            problemDetail.setProperty("technicaldetails", ex.getMessage());
+        }
 
         return ResponseEntity
                 .status(statusCode)
                 .headers(headers)
-                .body(
-                    buildResponse(
-                        error,
-                        statusCode.value(),
-                        errorType
-                    )
-                );
-    }
-
-    private ApiResponse<ErrorResponse> buildResponse(ErrorResponse error, int status, String customMessage){
-        return ApiResponse.<ErrorResponse>builder()
-                          .data(error)
-                          .message(customMessage)
-                          .timeStamp(LocalDateTime.now())
-                          .status(status)
-                          .build();
+                .body(problemDetail);
     }
 }

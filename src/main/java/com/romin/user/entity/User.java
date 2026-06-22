@@ -2,6 +2,7 @@ package com.romin.user.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.romin.task.entity.Task;
@@ -164,4 +165,25 @@ public class User {
         }
     )
     private List<Task> assignedTaskByMe = new ArrayList<>();
+
+    public List<Task> getTasksAssigned(){
+        if(tasksAssigned == null || tasksAssigned.isEmpty()){
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(tasksAssigned);
+    }
+
+    public List<User> getSubordinates(){
+        if(subordinates == null || subordinates.isEmpty()){
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(subordinates);
+    }
+
+    public List<Task> getAssignedTaskByMe(){
+        if(assignedTaskByMe == null || assignedTaskByMe.isEmpty()){
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(assignedTaskByMe);
+    }
 }

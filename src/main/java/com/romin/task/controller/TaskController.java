@@ -1,6 +1,6 @@
 package com.romin.task.controller;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -41,119 +41,67 @@ public class TaskController {
                                                         ){
         ServiceResult<TaskResponseDto> result = taskService.createTask(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                 .body(
-                     buildResponse(
-                           result,
-                           HttpStatus.CREATED.value()
-                       )
-                  );
+                 .body(buildResponse(result));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> deleteTask(@PathVariable Long id){
-        ServiceResult<Object> result = taskService.deleteTask(id);
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                    )
-               );
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/updateDescription")
+    @PatchMapping("/{id}/description")
     public ResponseEntity<ApiResponse<TaskResponseDto>> updateDescription(
                                                 @PathVariable Long id,
                                                 @Valid @RequestBody DescriptionRequest request
                                             ){
-        ServiceResult<TaskResponseDto> result = taskService.updateDescription(
-                                                                request,
-                                                                id
-                                                            );
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                   )
-               );
+        ServiceResult<TaskResponseDto> result = taskService.updateDescription(request, id);
+        return ResponseEntity.ok(buildResponse(result));
     }
 
-    @PatchMapping("/{id}/extendDue")
+    @PatchMapping("/{id}/due-date")
     public ResponseEntity<ApiResponse<TaskResponseDto>> extendDueDate(
                                                             @PathVariable Long id,
                                                             @Valid @RequestBody DueDateRequest request
                                                         ){
-        ServiceResult<TaskResponseDto> result = taskService.extendDueDate(
-                                                                request,
-                                                                id
-                                                            );
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result,
-                        HttpStatus.OK.value()
-                   )
-               );
+        ServiceResult<TaskResponseDto> result = taskService.extendDueDate(request, id);
+        return ResponseEntity.ok(buildResponse(result));
     }
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<TaskResponseDto>> cancelTask(@PathVariable Long id){
         ServiceResult<TaskResponseDto> result = taskService.cancelTask(id);
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                   )
-               );
+        return ResponseEntity.ok(buildResponse(result));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponseDto>> getTask(@PathVariable Long id){
          ServiceResult<TaskResponseDto> result = taskService.getTaskById(id);
-         return ResponseEntity.ok(
-                    buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                    )
-                );
+         return ResponseEntity.ok(buildResponse(result));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<TaskResponseDto>>> getAllTasks(){
         ServiceResult<List<TaskResponseDto>> result = taskService.getAllTask();
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                    )
-               );
+        return ResponseEntity.ok(buildResponse(result));
     }
 
     @PatchMapping("/{id}/start")
     public ResponseEntity<ApiResponse<TaskResponseDto>> startTask(@PathVariable Long id){
         ServiceResult<TaskResponseDto> result = taskService.startTask(id);
-        return ResponseEntity.ok(
-                   buildResponse(
-                        result, 
-                        HttpStatus.OK.value()
-                    )
-               );
+        return ResponseEntity.ok(buildResponse(result));
     }
 
     @PatchMapping("/{id}/complete")
     public ResponseEntity<ApiResponse<TaskResponseDto>> completeTask(@PathVariable Long id){
         ServiceResult<TaskResponseDto> result = taskService.completeTask(id);
-        return ResponseEntity.ok(
-                   buildResponse(
-                         result, 
-                         HttpStatus.OK.value()
-                   )
-               );
+        return ResponseEntity.ok(buildResponse(result));
     }
 
-    private <T> ApiResponse<T> buildResponse(ServiceResult<T> result, int status){
+    private <T> ApiResponse<T> buildResponse(ServiceResult<T> result){
         return ApiResponse.<T>builder()
                               .message(result.getMessage())
-                              .timeStamp(LocalDateTime.now())
-                              .status(status)
+                              .timeStamp(Instant.now())
                               .data(result.getData())
                               .build();
     }

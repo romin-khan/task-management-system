@@ -1,121 +1,113 @@
 package com.romin.task.exception;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.romin.infra.payload.ApiResponse;
-import com.romin.infra.payload.ErrorResponse;
-
+@SuppressWarnings("null")
 @RestControllerAdvice(basePackages = "com.romin.task")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleTaskNotFound(TaskNotFoundException ex){
-        String message = String.format(ex.getMessage()+"that");
-        ErrorResponse error = ErrorResponse.builder()
-                                           .detail(message)
-                                           .build();
-        return ResponseEntity
-               .status(HttpStatus.NOT_FOUND)
-               .body(
-                    buildResponse(
-                        error,
-                        HttpStatus.NOT_FOUND.value()
-                    )
-               );
+    public ResponseEntity<ProblemDetail> handleTaskNotFound(TaskNotFoundException ex) {
+        String detailMessage = String.format("%s that", ex.getMessage());
+        
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, detailMessage);
+        problemDetail.setTitle("Task Not Found");
+        
+        problemDetail.setType(URI.create("errors/task-not-found"));
+        
+        addCommonMetadata(problemDetail, "ERR_TASK_NOT_FOUND");
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalArgument(IllegalArgumentException ex){
-        String message = String.format(ex.getMessage()+"this");
-        ErrorResponse error = ErrorResponse.builder()
-                                           .detail(message)
-                                           .build();
-        return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                        buildResponse(
-                            error,
-                            HttpStatus.BAD_REQUEST.value()
-                        )
-                    );                                        
+    public ResponseEntity<ProblemDetail> handleIllegalArgument(IllegalArgumentException ex) {
+        String detailMessage = String.format("%s this", ex.getMessage());
+        
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detailMessage);
+        problemDetail.setTitle("Invalid Argument Provided");
+        
+        problemDetail.setType(URI.create("errors/invalid-argument"));
+        
+        addCommonMetadata(problemDetail, "ERR_INVALID_ARGUMENT");
+        
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalState(IllegalStateException ex){
-        String message = String.format(ex.getMessage()+"then");
-        ErrorResponse error = ErrorResponse.builder()
-                                           .detail(message)
-                                           .build();
-        return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(
-                        buildResponse(
-                            error,
-                            HttpStatus.CONFLICT.value()
-                        )
-                    );                                        
+    public ResponseEntity<ProblemDetail> handleIllegalState(IllegalStateException ex) {
+        String detailMessage = String.format("%s then", ex.getMessage());
+        
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, detailMessage);
+        problemDetail.setTitle("Illegal State Conflict");
+        
+        problemDetail.setType(URI.create("errors/invalid-state-transition"));
+        
+        addCommonMetadata(problemDetail, "ERR_ILLEGAL_STATE");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleValidationException(MethodArgumentNotValidException ex){
-        Map<String, List<String>> errors = new HashMap<>();
-        ex.getBindingResult()
-                .getFieldErrors()
-                .forEach(error -> {
-                    String field = error.getField();
-                    String message = error.getDefaultMessage();
-                    errors.computeIfAbsent(
-                                        field,
-                                        k -> new ArrayList<>()
-                                ).add(message);
-                });
-        ErrorResponse error = ErrorResponse.builder()
-                                           .detail("Validation failed")
-                                           .errors(errors)
-                                           .build();                                                               
-        return ResponseEntity
-                    .badRequest()
-                    .body(
-                        buildResponse(
-                            error,
-                            HttpStatus.BAD_REQUEST.value()
-                        )
-                    );        
+    public ResponseEntity<ProblemDetail> handleValidationException(MethodArgumentNotValidException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, 
+                "Validation checks failed on incoming request fields."
+        );
+        problemDetail.setTitle("Constraint Violation");
+        
+        problemDetail.setType(URI.create("errors/validation-failed"));
+
+        Map<String, List<String>> validationErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    error -> error.getField(),
+                    Collectors.mapping(
+                        FieldError::getDefaultMessage,
+                        Collectors.toList()
+                    )
+                )
+            )
+
+        problemDetail.setProperty("errors", validationErrors);
+        addCommonMetadata(problemDetail, "ERR_VALIDATION_FAILED");
+        
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleDataBaseVoilationException(DataIntegrityViolationException ex){
-        ErrorResponse error = ErrorResponse.builder()
-                                           .detail("Data conflict: A resource with these unique identifiers already exists, or required fields are missing.")
-                                           .build();
-        return ResponseEntity
-                     .status(HttpStatus.CONFLICT)
-                     .body(
-                        buildResponse(
-                            error,
-                            HttpStatus.CONFLICT.value()
-                        )
-                     );
+    public ResponseEntity<ProblemDetail> handleDatabaseViolationException(DataIntegrityViolationException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Data conflict: A resource with these unique identifiers already exists, or required fields are missing."
+        );
+        problemDetail.setTitle("Database Integrity Violation");
+        
+        problemDetail.setType(URI.create("errors/data-conflict"));
+        
+        addCommonMetadata(problemDetail, "ERR_DATABASE_CONFLICT");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
-    private ApiResponse<ErrorResponse> buildResponse(ErrorResponse error, int status){
-        return ApiResponse.<ErrorResponse>builder()
-                          .data(error)
-                          .message("Error occurred")
-                          .timeStamp(LocalDateTime.now())
-                          .status(status)
-                          .build();
+    private void addCommonMetadata(ProblemDetail problemDetail, String errorCode) {
+        problemDetail.setProperty("errorCode", errorCode);
+        problemDetail.setProperty("timestamp", Instant.now());
     }
 }
