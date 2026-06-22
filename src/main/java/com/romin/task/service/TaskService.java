@@ -19,7 +19,7 @@ import com.romin.user.entity.User;
 import com.romin.user.repository.UserRepo;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class TaskService {
 
     private final TaskRepo taskRepo;
@@ -31,6 +31,7 @@ public class TaskService {
     }
 
     @SuppressWarnings("null")
+    @Transactional
     public ServiceResult<TaskResponseDto> createTask(TaskRequestDto request){
 
         Long authorId = request.getAssignedBy();
@@ -54,12 +55,13 @@ public class TaskService {
         taskRepo.save(task);
 
         return new ServiceResult<>(
-            "Task is created successsfully",
+            "Task is created successfully",
             mapToDto(task)
         );
     }
 
     @SuppressWarnings("null")
+    @Transactional
     public ServiceResult<Object> deleteTask(Long id){
         Task task = getTaskOrThrow(id);
         taskRepo.delete(task);
@@ -69,6 +71,7 @@ public class TaskService {
                     );
     }
 
+    @Transactional
     public ServiceResult<TaskResponseDto> updateDescription(DescriptionRequest request, 
                                              Long id){
         Task task = getTaskOrThrow(id);
@@ -77,11 +80,12 @@ public class TaskService {
         taskRepo.save(task);
 
         return new ServiceResult<>(
-                        "Description updated succesfully",
+                        "Description updated successfully",
                         mapToDto(task)
                     );
     }
 
+    @Transactional
     public ServiceResult<TaskResponseDto> extendDueDate(DueDateRequest request,
                                          Long id){
         Task task = getTaskOrThrow(id);
@@ -93,6 +97,7 @@ public class TaskService {
                     );
     }
     
+    @Transactional
     public ServiceResult<TaskResponseDto> cancelTask(Long id){
         Task task = getTaskOrThrow(id);
         task.cancelTask();
@@ -105,6 +110,7 @@ public class TaskService {
                     );
     }
 
+    @Transactional
     public ServiceResult<TaskResponseDto> startTask(Long id){
         Task task = getTaskOrThrow(id);
         task.startTask();
@@ -115,6 +121,7 @@ public class TaskService {
                    );
     }
 
+    @Transactional
     public ServiceResult<TaskResponseDto> completeTask(Long id){
         Task task = getTaskOrThrow(id);
         TaskStatus previousStatus = task.completeTask();
@@ -135,7 +142,6 @@ public class TaskService {
                    );
     }
     
-    @Transactional(readOnly = true)
     public ServiceResult<TaskResponseDto> getTaskById(Long id){
         Task task = getTaskOrThrow(id);
         return new ServiceResult<>(
@@ -144,7 +150,6 @@ public class TaskService {
                     );
     }
     
-    @Transactional(readOnly = true)
     public ServiceResult<List<TaskResponseDto>> getAllTask(){
         return new ServiceResult<>(
                         "Tasks fetched successfully",

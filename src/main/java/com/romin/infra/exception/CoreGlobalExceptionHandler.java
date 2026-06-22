@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.lang.Nullable;
 
 @RestControllerAdvice
-public class CoreGlobalExceptionHandeller extends ResponseEntityExceptionHandler {
+public class CoreGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
    @Override
     protected ResponseEntity<Object> handleExceptionInternal(
@@ -51,7 +51,7 @@ public class CoreGlobalExceptionHandeller extends ResponseEntityExceptionHandler
         }else{
             HttpStatus status = HttpStatus.resolve(statusCode.value());
             title = (status != null) ? status.getReasonPhrase() : "Routing Error";
-            message = "Somthing went wrong on our end while processing your request. please try again shortly.";
+            message = "Something went wrong on our end while processing your request. please try again shortly.";
             errorCode = "ERR_API_WEB_FRAMEWORK_FAILURE";
         }
 
@@ -62,7 +62,7 @@ public class CoreGlobalExceptionHandeller extends ResponseEntityExceptionHandler
         problemDetail.setProperty("timestamp", Instant.now());
         
         if(statusCode.is4xxClientError()){
-            problemDetail.setProperty("technicaldetails", ex.getMessage());
+            problemDetail.setProperty("technicalDetails", ex.getMessage());
         }
 
         return ResponseEntity
