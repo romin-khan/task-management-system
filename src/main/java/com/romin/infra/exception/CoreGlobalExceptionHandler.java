@@ -1,73 +1,117 @@
 package com.romin.infra.exception;
 
+import java.net.URI;
 import java.time.Instant;
 
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import org.springframework.lang.Nullable;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 
 @RestControllerAdvice
-public class CoreGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class CoreGlobalExceptionHandler{
 
-   @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            @NonNull Exception ex, 
-            @Nullable Object body, 
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode statusCode, 
-            @NonNull WebRequest request) {
+    private static final URI TYPE_BAD_REQUEST = URI.create("urn:problem-type:bad-request");
+    private static final URI TYPE_ROUTE_NOT_FOUND = URI.create("urn:problem-type:route-not-found");
+    private static final URI TYPE_METHOD_NOT_ALLOWED = URI.create("urn:problem-type:method-not-allowed");
+    private static final URI TYPE_UNSUPPORTED_MEDIA = URI.create("urn:problem-type:unsupported-media");
+    private static final URI TYPE_INTERNAL_SERVER_ERROR = URI.create("urn:problem-type:internal-server-error");
 
-        String message;
-        String title;
-        String errorCode;
+    @SuppressWarnings("null")
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleMalformedJson(HttpMessageNotReadableException ex) {
+        return buildProblem(
+                HttpStatus.BAD_REQUEST,
+                "Malformed JSON Request",
+                "The server could not read your payload. Please ensure your JSON string syntax format is valid.",
+                "ERR_API_MALFORMED_JSON",
+                TYPE_BAD_REQUEST,
+                ex
+        );
+    }
 
-        if(statusCode.equals(HttpStatus.BAD_REQUEST)){
-            title = "Invalid Submission";
-            message = "We couldn't process your information because some data was formatted incorrectly. Please check your inputs.";
+    @SuppressWarnings("null")
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ProblemDetail handleNotFound(Exception ex) {
+        return buildProblem(
+                HttpStatus.NOT_FOUND, 
+                "Route Not Found", 
+                "The page or feature endpoint you are trying to reach doesn't exist.", 
+                "ERR_API_ROUTE_NOT_FOUND", 
+                TYPE_ROUTE_NOT_FOUND, 
+                ex
+        );
+    }
+
+    @SuppressWarnings("null")
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ProblemDetail handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        return buildProblem(
+                HttpStatus.METHOD_NOT_ALLOWED, 
+                "Action Not Allowed", 
+                "The HTTP action verb you performed is not supported by this API endpoint.", 
+                "ERR_API_METHOD_NOT_ALLOWED", 
+                TYPE_METHOD_NOT_ALLOWED, 
+                ex
+        );
+    }
+
+    @SuppressWarnings("null")
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ProblemDetail handleUnsupportedMedia(HttpMediaTypeNotSupportedException ex) {
+        return buildProblem(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE, 
+                "Unsupported Media Type", 
+                "Content-Type mismatch. We only support data payload transfers in valid JSON format.", 
+                "ERR_API_UNSUPPORTED_MEDIA", 
+                TYPE_UNSUPPORTED_MEDIA, 
+                ex
+        );
+    }
+
+    // Handle Server Issues (500 Internal Server Boundary - Runtime/JVM Crashes)
+    @SuppressWarnings("null")
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleAllRemainingErrors(Exception ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String title = "Server Error";
+        String message = "Something went wrong on our end while processing your request.";
+        String errorCode = "ERR_API_WEB_FRAMEWORK_FAILURE";
+        URI typeUri = TYPE_INTERNAL_SERVER_ERROR;
+
+        if (ex instanceof org.springframework.web.server.ResponseStatusException rse) {
+            status = HttpStatus.valueOf(rse.getStatusCode().value());
+            title = "Request Error";
+            message = rse.getReason();
             errorCode = "ERR_API_BAD_REQUEST";
-        }
-        else if(statusCode.equals(HttpStatus.NOT_FOUND)){
-            title = "Route Not Found";
-            message = "The page or feature you are trying to reach doesn't seem to exist. Please verify the URL.";
-            errorCode = "ERR_API_ROUTE_NOT_FOUND";
-        }
-        else if(statusCode.equals(HttpStatus.METHOD_NOT_ALLOWED)){
-            title = "Action Not Allowed";
-            message = "The action you are trying to perform is not supported by this screen. Please refresh and try again.";
-            errorCode = "ERR_API_ROUTE_NOT_FOUND";
-        }
-        else if(statusCode.equals(HttpStatus.UNSUPPORTED_MEDIA_TYPE)){
-            title = "Unsupported Media Type";
-            message = "we only support data in form of JSON";
-            errorCode = "ERR_API_UNSUPPORTED_MEDIA";
-        }else{
-            HttpStatus status = HttpStatus.resolve(statusCode.value());
-            title = (status != null) ? status.getReasonPhrase() : "Routing Error";
-            message = "Something went wrong on our end while processing your request. please try again shortly.";
-            errorCode = "ERR_API_WEB_FRAMEWORK_FAILURE";
+            typeUri = TYPE_BAD_REQUEST;
+        } else {
+            ex.printStackTrace();
         }
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(statusCode, message);
+        return buildProblem(status, title, message, errorCode, typeUri, ex);
+    }
+
+    private ProblemDetail buildProblem(@NonNull HttpStatus status, String title, String detail, String errorCode, @NonNull URI typeUri, Exception ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
+        
+        problemDetail.setType(typeUri); 
         problemDetail.setTitle(title);
-
         problemDetail.setProperty("errorCode", errorCode);
         problemDetail.setProperty("timestamp", Instant.now());
-        
-        if(statusCode.is4xxClientError()){
+
+        if (status.is4xxClientError()) {
             problemDetail.setProperty("technicalDetails", ex.getMessage());
         }
-
-        return ResponseEntity
-                .status(statusCode)
-                .headers(headers)
-                .body(problemDetail);
+        return problemDetail;
     }
 }

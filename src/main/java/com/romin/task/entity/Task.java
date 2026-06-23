@@ -106,7 +106,7 @@ public class Task{
             throw new IllegalStateException("Doesn't need to extend due date because task is completed");
         }
         if(status == TaskStatus.CANCELLED){
-            throw new IllegalStateException("Coudn't able to extend due date because task is cancelled");
+            throw new IllegalStateException("couldn't able to extend due date because task is cancelled");
         }
 
         this.dueDate=extendedDueDate;
@@ -114,7 +114,7 @@ public class Task{
 
     public void updateDescription(String updatedDescription){
         if(this.status != TaskStatus.NOT_STARTED){
-            throw new IllegalStateException("Description cannot be changed after the task is excecuted");
+            throw new IllegalStateException("Description cannot be changed after the task is executed");
         }
 
         this.description=updatedDescription;
@@ -140,27 +140,27 @@ public class Task{
             throw new IllegalStateException("Task is already completed");
         }
         
-        TaskStatus previousstatus;
+        TaskStatus previousStatus;
 
         if(this.status == TaskStatus.CANCELLED){
-            previousstatus = TaskStatus.CANCELLED;
+            previousStatus = TaskStatus.CANCELLED;
         }
         else if(this.status == TaskStatus.NOT_STARTED){
-            previousstatus = TaskStatus.NOT_STARTED;
+            previousStatus = TaskStatus.NOT_STARTED;
         }
         else{
-            previousstatus = TaskStatus.IN_PROGRESS;
+            previousStatus = TaskStatus.IN_PROGRESS;
         }
 
         this.status=TaskStatus.IS_COMPLETED;
         this.completionDate=LocalDateTime.now();
 
-        return previousstatus;
+        return previousStatus;
     }
 
     public void cancelTask(){
             if(this.status == TaskStatus.IN_PROGRESS)
-                throw new IllegalStateException("Cannot cancel the task which is in progres");
+                throw new IllegalStateException("Cannot cancel the task which is in progress");
             
             if(this.status == TaskStatus.IS_COMPLETED)
                 throw new IllegalStateException("Cannot cancel the task which is completed");

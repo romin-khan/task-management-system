@@ -8,7 +8,6 @@ import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.entity.Task;
-import com.romin.task.entity.TaskStatus;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class TaskService {
 
     @SuppressWarnings("null")
     @Transactional
-    public ServiceResult<TaskResponseDto> createTask(TaskRequestDto request){
+    public TaskResponseDto createTask(TaskRequestDto request){
 
         Long authorId = request.getAssignedBy();
         Long targetId = request.getAssignedTo();
@@ -45,119 +44,75 @@ public class TaskService {
                                         .orElseThrow(
                                             () -> new InvalidParameterException("User not found of id "+targetId) 
                                         );
-
-
         Task task = new Task(request.getTitle(),
                              request.getDescription(),
                              assignedBy,
                              assignedTo,
                              request.getDueDate());
-        taskRepo.save(task);
 
-        return new ServiceResult<>(
-            "Task is created successfully",
-            mapToDto(task)
-        );
+        return mapToDto(task);
     }
 
     @SuppressWarnings("null")
     @Transactional
-    public ServiceResult<Object> deleteTask(Long id){
+    public void deleteTask(Long id){
         Task task = getTaskOrThrow(id);
         taskRepo.delete(task);
-        return new ServiceResult<>(
-                        "Task deleted Successfully",
-                        null
-                    );
     }
 
     @Transactional
-    public ServiceResult<TaskResponseDto> updateDescription(DescriptionRequest request, 
+    public TaskResponseDto updateDescription(DescriptionRequest request, 
                                              Long id){
         Task task = getTaskOrThrow(id);
         task.updateDescription(request.getDescription());
 
-        taskRepo.save(task);
-
-        return new ServiceResult<>(
-                        "Description updated successfully",
-                        mapToDto(task)
-                    );
+        return mapToDto(task);
     }
 
     @Transactional
-    public ServiceResult<TaskResponseDto> extendDueDate(DueDateRequest request,
+    public TaskResponseDto extendDueDate(DueDateRequest request,
                                          Long id){
         Task task = getTaskOrThrow(id);
         task.extendDueDate(request.getDueDate(),task.getStatus());
 
-        return new ServiceResult<>(
-                        "Due date is extended successfully",
-                        mapToDto(task)
-                    );
+        return mapToDto(task);
     }
     
     @Transactional
-    public ServiceResult<TaskResponseDto> cancelTask(Long id){
+    public TaskResponseDto cancelTask(Long id){
         Task task = getTaskOrThrow(id);
         task.cancelTask();
 
-        taskRepo.save(task);
-
-        return new ServiceResult<>(
-                        "Task is cancelled",
-                        mapToDto(task)
-                    );
+        return mapToDto(task);
     }
 
     @Transactional
-    public ServiceResult<TaskResponseDto> startTask(Long id){
+    public TaskResponseDto startTask(Long id){
         Task task = getTaskOrThrow(id);
         task.startTask();
 
-        return new ServiceResult<>(
-                        "Task is started",
-                        mapToDto(task)
-                   );
+        return mapToDto(task);
     }
 
     @Transactional
-    public ServiceResult<TaskResponseDto> completeTask(Long id){
+    public TaskResponseDto completeTask(Long id){
         Task task = getTaskOrThrow(id);
-        TaskStatus previousStatus = task.completeTask();
+        task.completeTask();
 
-        String message;
-
-        if(previousStatus == TaskStatus.CANCELLED){
-            message = "The task is cancelled, but now it is marked as completed";
-        }else if(previousStatus == TaskStatus.NOT_STARTED){
-            message = "the task  is not started yet, but now marked as completed";
-        }else{
-            message = "the task is marked completed";
-        }
-        taskRepo.save(task);
-        return new ServiceResult<>(
-                       message,
-                       mapToDto(task)
-                   );
+        return mapToDto(task);
     }
     
-    public ServiceResult<TaskResponseDto> getTaskById(Long id){
+    public TaskResponseDto getTaskById(Long id){
         Task task = getTaskOrThrow(id);
-        return new ServiceResult<>(
-                        "Task fetched successfully",
-                        mapToDto(task)
-                    );
+        
+        return mapToDto(task);
     }
     
-    public ServiceResult<List<TaskResponseDto>> getAllTask(){
-        return new ServiceResult<>(
-                        "Tasks fetched successfully",
-                        taskRepo.findAll()
-                            .stream()
-                            .map(this::mapToDto)
-                            .toList()
-                    );
+    public List<TaskResponseDto> getAllTask(){
+        return taskRepo.findAll()
+                    .stream()
+                    .map(this::mapToDto)
+                    .toList();
     }
 
     private Task getTaskOrThrow(Long id){
