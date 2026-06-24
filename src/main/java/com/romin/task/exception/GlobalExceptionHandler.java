@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         return buildProblem(
                 HttpStatus.NOT_FOUND,
                 "Task Not Found",
-                String.format("%s that", ex.getMessage()),
+                String.format("%s ", ex.getMessage()),
                 "ERR_TASK_NOT_FOUND",
                 TYPE_TASK_NOT_FOUND
         );
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
         return buildProblem(
                 HttpStatus.BAD_REQUEST,
                 "Invalid Argument Provided",
-                String.format("%s this", ex.getMessage()),
+                String.format("%s ", ex.getMessage()),
                 "ERR_INVALID_ARGUMENT",
                 TYPE_INVALID_ARGUMENT
         );
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
         return buildProblem(
                 HttpStatus.CONFLICT,
                 "Illegal State Conflict",
-                String.format("%s then", ex.getMessage()),
+                String.format("%s ", ex.getMessage()),
                 "ERR_ILLEGAL_STATE",
                 TYPE_INVALID_STATE
         );

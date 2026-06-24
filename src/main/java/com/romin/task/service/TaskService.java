@@ -1,14 +1,17 @@
 package com.romin.task.service;
 
 import java.security.InvalidParameterException;
-import java.util.List;
 
+import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.DescriptionRequest;
 import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.entity.Task;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,11 +111,9 @@ public class TaskService {
         return mapToDto(task);
     }
     
-    public List<TaskResponseDto> getAllTask(){
-        return taskRepo.findAll()
-                    .stream()
-                    .map(this::mapToDto)
-                    .toList();
+    public PaginatedResponse<TaskResponseDto> getAllTask(@NonNull Pageable pageable){
+        Page<TaskResponseDto> response = taskRepo.findAll(pageable).map(this::mapToDto);
+        return PaginatedResponse.from(response);
     }
 
     private Task getTaskOrThrow(Long id){

@@ -17,7 +17,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 
 @RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE+1)
 public class CoreGlobalExceptionHandler{
 
     private static final URI TYPE_BAD_REQUEST = URI.create("urn:problem-type:bad-request");

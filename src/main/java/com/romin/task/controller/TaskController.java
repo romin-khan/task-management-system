@@ -1,13 +1,17 @@
 package com.romin.task.controller;
 
-import java.util.List;
+import java.util.Set;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.DescriptionRequest;
 import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
@@ -48,17 +52,15 @@ public class TaskController {
     @PatchMapping("/{id}/description")
     public ResponseEntity<TaskResponseDto> updateDescription(
                                                 @PathVariable Long id,
-                                                @Valid @RequestBody DescriptionRequest request
-                                            ){
+                                                @Valid @RequestBody DescriptionRequest request){
         TaskResponseDto response = taskService.updateDescription(request, id);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/due-date")
     public ResponseEntity<TaskResponseDto> extendDueDate(
-                                                            @PathVariable Long id,
-                                                            @Valid @RequestBody DueDateRequest request
-                                                        ){
+                                                @PathVariable Long id,
+                                                @Valid @RequestBody DueDateRequest request ){
         TaskResponseDto response = taskService.extendDueDate(request, id);
         return ResponseEntity.ok(response);
     }
@@ -76,9 +78,13 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDto>> getAllTasks(){
-        List<TaskResponseDto> response = taskService.getAllTask();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<PaginatedResponse<TaskResponseDto>> getAllTasks(
+                                            @PageableDefault(size = 5, sort = "dueDate") Pageable pageable
+                                        ){
+        validateSortProperties(pageable.getSort());
+        return ResponseEntity.ok(
+            taskService.getAllTask(pageable)
+        );
     }
 
     @PatchMapping("/{id}/start")
@@ -93,4 +99,13 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    private void validateSortProperties(Sort sort) {
+        Set<String> validFields = Set.of("title", "status", "assignedBy", "assignedTo", "createdAt", "completionDate", "dueDate");
+        
+        for (Sort.Order order : sort) {
+            if (!validFields.contains(order.getProperty())) {
+                throw new IllegalArgumentException("Invalid sorting properties: " + order.getProperty() + ", the sorting properties are: " + validFields);
+            }
+        }
+    }
 }
