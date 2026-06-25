@@ -1,7 +1,8 @@
 package com.romin.task.entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.romin.user.entity.User;
 
@@ -45,6 +46,9 @@ public class Task{
     )
     private Long id;
 
+    @Column(name = "task_id", nullable = false)
+    private String taskId;
+
     @NonNull
     @Column(nullable = false, length = 100)
     private String title;
@@ -78,10 +82,10 @@ public class Task{
     private User assignedTo;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(nullable = true)
-    private LocalDateTime completionDate;
+    private Instant completionDate;
 
     @NonNull
     @Column(nullable = false)
@@ -89,12 +93,24 @@ public class Task{
 
     @PrePersist
     public void init(){
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
         this.status = TaskStatus.NOT_STARTED;
+
+        int currentYear = LocalDate.now().getYear();
+        String deptName = "TECH";
+        String taskType = "BUG";
+        String uniqueSubSuffix = UUID.randomUUID().toString().substring(0, 3).toUpperCase();
+        
+        this.taskId = String.format("TSK-%d-%s-%s-%d-%s",
+                             currentYear,
+                             deptName,
+                             taskType,
+                             this.assignedBy.getId(),
+                             uniqueSubSuffix);
     }
 
     public void markAsCompleted(){
-        this.completionDate = LocalDateTime.now();
+        this.completionDate = Instant.now();
         this.status=TaskStatus.IS_COMPLETED;
     }
 
@@ -153,7 +169,7 @@ public class Task{
         }
 
         this.status=TaskStatus.IS_COMPLETED;
-        this.completionDate=LocalDateTime.now();
+        this.completionDate=Instant.now();
 
         return previousStatus;
     }

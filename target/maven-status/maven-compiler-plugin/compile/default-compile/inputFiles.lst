@@ -1,7 +1,10 @@
 /home/alikhan/task_management/src/main/java/com/romin/TaskManagementApplication.java
+/home/alikhan/task_management/src/main/java/com/romin/infra/dto/PaginatedResponse.java
+/home/alikhan/task_management/src/main/java/com/romin/infra/exception/CoreGlobalExceptionHandler.java
 /home/alikhan/task_management/src/main/java/com/romin/task/controller/TaskController.java
+/home/alikhan/task_management/src/main/java/com/romin/task/dto/request/DescriptionRequest.java
+/home/alikhan/task_management/src/main/java/com/romin/task/dto/request/DueDateRequest.java
 /home/alikhan/task_management/src/main/java/com/romin/task/dto/request/TaskRequestDto.java
-/home/alikhan/task_management/src/main/java/com/romin/task/dto/response/ErrorResponse.java
 /home/alikhan/task_management/src/main/java/com/romin/task/dto/response/TaskResponseDto.java
 /home/alikhan/task_management/src/main/java/com/romin/task/entity/Task.java
 /home/alikhan/task_management/src/main/java/com/romin/task/entity/TaskStatus.java
@@ -9,3 +12,8 @@
 /home/alikhan/task_management/src/main/java/com/romin/task/exception/TaskNotFoundException.java
 /home/alikhan/task_management/src/main/java/com/romin/task/repository/TaskRepo.java
 /home/alikhan/task_management/src/main/java/com/romin/task/service/TaskService.java
+/home/alikhan/task_management/src/main/java/com/romin/user/entity/User.java
+/home/alikhan/task_management/src/main/java/com/romin/user/enums/Position.java
+/home/alikhan/task_management/src/main/java/com/romin/user/enums/Role.java
+/home/alikhan/task_management/src/main/java/com/romin/user/enums/Status.java
+/home/alikhan/task_management/src/main/java/com/romin/user/repository/UserRepo.java

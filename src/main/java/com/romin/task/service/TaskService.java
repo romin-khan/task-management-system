@@ -47,11 +47,14 @@ public class TaskService {
                                         .orElseThrow(
                                             () -> new InvalidParameterException("User not found of id "+targetId) 
                                         );
+
         Task task = new Task(request.getTitle(),
                              request.getDescription(),
                              assignedBy,
                              assignedTo,
                              request.getDueDate());
+
+        taskRepo.save(task);                     
 
         return mapToDto(task);
     }
@@ -128,15 +131,15 @@ public class TaskService {
 
     private TaskResponseDto mapToDto(Task task){
         return TaskResponseDto.builder()
-                                .id(task.getId())
-                                .title(task.getTitle())
-                                .description(task.getDescription())
-                                .status(task.getStatus())
-                                .assignedBy(task.getAssignedBy().getId())
-                                .assignedTo(task.getAssignedTo().getId())
-                                .createdAt(task.getCreatedAt())
-                                .dueDate(task.getDueDate())
-                                .completionDate(task.getCompletionDate())
+                              .assignedBy(task.getAssignedBy().getId())
+                              .assignedTo(task.getAssignedTo().getId())
+                              .completionDate(task.getCompletionDate())
+                              .createdAt(task.getCreatedAt())
+                              .description(task.getDescription())
+                              .dueDate(task.getDueDate())
+                              .taskId(task.getTaskId())
+                              .status(task.getStatus())
+                              .title(task.getTitle())
                               .build();
     }
 }
