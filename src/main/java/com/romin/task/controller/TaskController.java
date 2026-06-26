@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.romin.infra.dto.PaginatedResponse;
-import com.romin.task.dto.request.DescriptionRequest;
-import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
+import com.romin.task.dto.request.UpdateRequest;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.service.TaskService;
 
@@ -43,59 +42,49 @@ public class TaskController {
                  .body(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
-        taskService.deleteTask(id);
+    @DeleteMapping("/{publicId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable String publicId){
+        taskService.deleteTaskByPublicId(publicId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/description")
-    public ResponseEntity<TaskResponseDto> updateDescription(
-                                                @PathVariable Long id,
-                                                @Valid @RequestBody DescriptionRequest request){
-        TaskResponseDto response = taskService.updateDescription(request, id);
+    @PatchMapping("/{publicId}")
+    public ResponseEntity<TaskResponseDto> update(@PathVariable String publicId,
+                                                  @Valid @RequestBody UpdateRequest request){
+        TaskResponseDto response = taskService.update(request, publicId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/due-date")
-    public ResponseEntity<TaskResponseDto> extendDueDate(
-                                                @PathVariable Long id,
-                                                @Valid @RequestBody DueDateRequest request ){
-        TaskResponseDto response = taskService.extendDueDate(request, id);
+    @PatchMapping("/{publicId}/cancel")
+    public ResponseEntity<TaskResponseDto> cancelTask(@PathVariable String publicId){
+        TaskResponseDto response = taskService.cancelTask(publicId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/cancel")
-    public ResponseEntity<TaskResponseDto> cancelTask(@PathVariable Long id){
-        TaskResponseDto response = taskService.cancelTask(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> getTask(@PathVariable Long id){
-         TaskResponseDto response = taskService.getTaskById(id);
+    @GetMapping("/{publicId}")
+    public ResponseEntity<TaskResponseDto> getTask(@PathVariable String publicId){
+         TaskResponseDto response = taskService.getTaskById(publicId);
          return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<TaskResponseDto>> getAllTasks(
-                                            @PageableDefault(size = 5, sort = "dueDate") Pageable pageable
-                                        ){
+                                            @PageableDefault(size = 5, sort = "dueDate") Pageable pageable){
         validateSortProperties(pageable.getSort());
         return ResponseEntity.ok(
             taskService.getAllTask(pageable)
         );
     }
 
-    @PatchMapping("/{id}/start")
-    public ResponseEntity<TaskResponseDto> startTask(@PathVariable Long id){
-        TaskResponseDto response = taskService.startTask(id);
+    @PatchMapping("/{publicId}/start")
+    public ResponseEntity<TaskResponseDto> startTask(@PathVariable String publicId){
+        TaskResponseDto response = taskService.startTask(publicId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/complete")
-    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable Long id){
-        TaskResponseDto response = taskService.completeTask(id);
+    @PatchMapping("/{publicId}/complete")
+    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable String publicId){
+        TaskResponseDto response = taskService.completeTask(publicId);
         return ResponseEntity.ok(response);
     }
 

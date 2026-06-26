@@ -46,8 +46,11 @@ public class Task{
     )
     private Long id;
 
-    @Column(name = "task_id", nullable = false)
+    @Column(name = "task_id", nullable = false, unique = true, length = 50)
     private String taskId;
+
+    @Column(name = "public_id", nullable = false, updatable = false, unique = true, length = 36)
+    private String publicId;
 
     @NonNull
     @Column(nullable = false, length = 100)
@@ -107,6 +110,8 @@ public class Task{
                              taskType,
                              this.assignedBy.getId(),
                              uniqueSubSuffix);
+
+        this.publicId = UUID.randomUUID().toString();
     }
 
     public void markAsCompleted(){
@@ -114,26 +119,41 @@ public class Task{
         this.status=TaskStatus.IS_COMPLETED;
     }
 
-    public void extendDueDate(LocalDate extendedDueDate, TaskStatus status){
-        if(dueDate.isAfter(extendedDueDate)){
-            throw new IllegalArgumentException("Extended due date should be after previous date");
+    public void update(String newDescription, LocalDate newDueDate, String newTitle){
+        if(this.status == TaskStatus.IS_COMPLETED){
+            throw new IllegalStateException("Cannot modify a task that is already completed.");
         }
-        if(status == TaskStatus.IS_COMPLETED){
-            throw new IllegalStateException("Doesn't need to extend due date because task is completed");
-        }
-        if(status == TaskStatus.CANCELLED){
-            throw new IllegalStateException("couldn't able to extend due date because task is cancelled");
+        if(this.status == TaskStatus.CANCELLED){
+            throw new IllegalStateException("Cannot modify a cancelled task.");
         }
 
-        this.dueDate=extendedDueDate;
-    }
-
-    public void updateDescription(String updatedDescription){
-        if(this.status != TaskStatus.NOT_STARTED){
-            throw new IllegalStateException("Description cannot be changed after the task is executed");
+        if(newTitle != null){
+            String trimmedTitle = newTitle.trim();
+            
+            if (trimmedTitle.isEmpty() || trimmedTitle.length() < 3) {
+                throw new IllegalArgumentException("Title cannot be blank or shorter than 3 characters.");
+            }
+            this.title = trimmedTitle;
         }
+        if(newDescription != null){
+            if(this.status != TaskStatus.NOT_STARTED){
+                throw new IllegalStateException("Description cannot be changed after the task has started.");
+            }
 
-        this.description=updatedDescription;
+            String trimmedDescription = newDescription.trim();
+
+            if (trimmedDescription.isEmpty() || trimmedDescription.length() < 5) {
+                throw new IllegalArgumentException("Description cannot be blank or shorter than 5 characters.");
+            }
+            this.description = trimmedDescription;
+        }
+        
+        if (newDueDate != null) {
+            if (this.dueDate.isAfter(newDueDate)) {
+                throw new IllegalArgumentException("Extended due date must be after the current due date.");
+            }
+            this.dueDate = newDueDate;
+        }
     }
     
     public void startTask(){

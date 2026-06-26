@@ -3,9 +3,8 @@ package com.romin.task.service;
 import java.security.InvalidParameterException;
 
 import com.romin.infra.dto.PaginatedResponse;
-import com.romin.task.dto.request.DescriptionRequest;
-import com.romin.task.dto.request.DueDateRequest;
 import com.romin.task.dto.request.TaskRequestDto;
+import com.romin.task.dto.request.UpdateRequest;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.entity.Task;
 
@@ -61,55 +60,46 @@ public class TaskService {
 
     @SuppressWarnings("null")
     @Transactional
-    public void deleteTask(Long id){
-        Task task = getTaskOrThrow(id);
+    public void deleteTaskByPublicId(String publicId){
+        Task task = getTaskOrThrow(publicId);
         taskRepo.delete(task);
     }
 
     @Transactional
-    public TaskResponseDto updateDescription(DescriptionRequest request, 
-                                             Long id){
-        Task task = getTaskOrThrow(id);
-        task.updateDescription(request.getDescription());
-
-        return mapToDto(task);
-    }
-
-    @Transactional
-    public TaskResponseDto extendDueDate(DueDateRequest request,
-                                         Long id){
-        Task task = getTaskOrThrow(id);
-        task.extendDueDate(request.getDueDate(),task.getStatus());
+    public TaskResponseDto update(UpdateRequest request, 
+                                             String publicId){
+        Task task = getTaskOrThrow(publicId);
+        task.update(request.description(), request.dueDate(), request.title());
 
         return mapToDto(task);
     }
     
     @Transactional
-    public TaskResponseDto cancelTask(Long id){
-        Task task = getTaskOrThrow(id);
+    public TaskResponseDto cancelTask(String publicId){
+        Task task = getTaskOrThrow(publicId);
         task.cancelTask();
 
         return mapToDto(task);
     }
 
     @Transactional
-    public TaskResponseDto startTask(Long id){
-        Task task = getTaskOrThrow(id);
+    public TaskResponseDto startTask(String publicId){
+        Task task = getTaskOrThrow(publicId);
         task.startTask();
 
         return mapToDto(task);
     }
 
     @Transactional
-    public TaskResponseDto completeTask(Long id){
-        Task task = getTaskOrThrow(id);
+    public TaskResponseDto completeTask(String publicId){
+        Task task = getTaskOrThrow(publicId);
         task.completeTask();
 
         return mapToDto(task);
     }
     
-    public TaskResponseDto getTaskById(Long id){
-        Task task = getTaskOrThrow(id);
+    public TaskResponseDto getTaskById(String publicId){
+        Task task = getTaskOrThrow(publicId);
         
         return mapToDto(task);
     }
@@ -119,13 +109,13 @@ public class TaskService {
         return PaginatedResponse.from(response);
     }
 
-    private Task getTaskOrThrow(Long id){
-        if (id == null) {
+    private Task getTaskOrThrow(String publicId){
+        if (publicId == null) {
             throw new TaskNotFoundException("Task cannot be found because the provided ID is null");
         }
-        return taskRepo.findById(id)
+        return taskRepo.findByPublicId(publicId)
                    .orElseThrow(
-                       () -> new TaskNotFoundException("Task having id = "+id+" not found")
+                       () -> new TaskNotFoundException("Task having id = "+publicId+" not found")
                    );
     }
 
