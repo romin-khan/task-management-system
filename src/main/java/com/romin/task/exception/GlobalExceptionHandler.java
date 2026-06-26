@@ -17,6 +17,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice(basePackages = "com.romin.task")
 @Order(Ordered.HIGHEST_PRECEDENCE) 
 public class GlobalExceptionHandler {
@@ -30,6 +33,7 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("null")
     @ExceptionHandler(TaskNotFoundException.class)
     public ProblemDetail handleTaskNotFound(TaskNotFoundException ex) {
+        log.warn("[EXCEPTION] Task lookup failed at API boundary. Message: {}", ex.getMessage());
         return buildProblem(
                 HttpStatus.NOT_FOUND,
                 "Task Not Found",
@@ -42,6 +46,7 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("null")
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("[EXCEPTION] Invalid argument intercepted at API boundary. Message: {}", ex.getMessage());
         return buildProblem(
                 HttpStatus.BAD_REQUEST,
                 "Invalid Argument Provided",
@@ -54,6 +59,7 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("null")
     @ExceptionHandler(IllegalStateException.class)
     public ProblemDetail handleIllegalState(IllegalStateException ex) {
+        log.warn("[EXCEPTION] Business state invariant breach intercepted. Message: {}", ex.getMessage());
         return buildProblem(
                 HttpStatus.CONFLICT,
                 "Illegal State Conflict",
@@ -65,6 +71,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationException(MethodArgumentNotValidException ex) {
+        log.warn("[EXCEPTION] Payload binding constraint check failed. Total Field Faults: {}", 
+                 ex.getBindingResult().getFieldErrorCount());
+
         @SuppressWarnings("null")
         ProblemDetail problemDetail = buildProblem(
                 HttpStatus.BAD_REQUEST,
@@ -74,14 +83,16 @@ public class GlobalExceptionHandler {
                 TYPE_VALIDATION_FAILED
         );
 
+        @SuppressWarnings("null")
         Map<String, List<String>> validationErrors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.groupingBy(
-                        FieldError::getField,
-                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                         FieldError::getField,
+                         Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
                 ));
 
+        log.debug("[EXCEPTION] Detailed constraint violations mapped for payload fields: {}", validationErrors.keySet());
         problemDetail.setProperty("errors", validationErrors);
         return problemDetail;
     }
@@ -89,6 +100,7 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("null")
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDatabaseViolationException(DataIntegrityViolationException ex) {
+        log.error("[DATABASE ERROR] Low-level data integrity constraint breached. Cause: {}", ex.getMostSpecificCause().getMessage());
         return buildProblem(
                 HttpStatus.CONFLICT,
                 "Database Integrity Violation",

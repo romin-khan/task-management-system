@@ -25,13 +25,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor
 @Getter
 @Entity
 @Table(name = "tasks")
-public class Task{
+public class Task {
 
     @Id
     @GeneratedValue(
@@ -98,6 +100,7 @@ public class Task{
     public void init(){
         this.createdAt = Instant.now();
         this.status = TaskStatus.NOT_STARTED;
+        this.publicId = UUID.randomUUID().toString();
 
         int currentYear = LocalDate.now().getYear();
         String deptName = "TECH";
@@ -110,53 +113,69 @@ public class Task{
                              taskType,
                              this.assignedBy.getId(),
                              uniqueSubSuffix);
-
-        this.publicId = UUID.randomUUID().toString();
+        
+        log.info("[DOMAIN LCA] Lifecycle PrePersist hook executed. Generated publicId: {}, businessId: {}", 
+                 this.publicId, this.taskId);
     }
 
     public void markAsCompleted(){
+        log.info("[DOMAIN ACT] Explicit marking complete command invoked. Business ID: {}", this.taskId);
         this.completionDate = Instant.now();
-        this.status=TaskStatus.IS_COMPLETED;
+        this.status = TaskStatus.IS_COMPLETED;
     }
 
     public void update(String newDescription, LocalDate newDueDate, String newTitle){
+        log.info("[DOMAIN MUT] Processing update validation loop. Current Status: {}, Business ID: {}", this.status, this.taskId);
+        
         if(this.status == TaskStatus.IS_COMPLETED){
+            log.warn("[MUTATION REJECTED] Cannot modify a task that is already completed. Business ID: {}", this.taskId);
             throw new IllegalStateException("Cannot modify a task that is already completed.");
         }
         if(this.status == TaskStatus.CANCELLED){
+            log.warn("[MUTATION REJECTED] Cannot modify a cancelled task. Business ID: {}", this.taskId);
             throw new IllegalStateException("Cannot modify a cancelled task.");
         }
 
         if(newTitle != null){
             String trimmedTitle = newTitle.trim();
+            log.debug("[DOMAIN MUT] Evaluating title payload string properties.");
             
             if (trimmedTitle.isEmpty() || trimmedTitle.length() < 3) {
+                log.warn("[MUTATION REJECTED] Title payload criteria breach. Input length under threshold.");
                 throw new IllegalArgumentException("Title cannot be blank or shorter than 3 characters.");
             }
             this.title = trimmedTitle;
         }
+        
         if(newDescription != null){
+            log.debug("[DOMAIN MUT] Evaluating description phase adjustments against active lifecycles.");
             if(this.status != TaskStatus.NOT_STARTED){
+                log.warn("[MUTATION REJECTED] Description changes prohibited once task steps away from NOT_STARTED. Status: {}", this.status);
                 throw new IllegalStateException("Description cannot be changed after the task has started.");
             }
 
             String trimmedDescription = newDescription.trim();
 
             if (trimmedDescription.isEmpty() || trimmedDescription.length() < 5) {
+                log.warn("[MUTATION REJECTED] Description length check failed. Provided input text is too short.");
                 throw new IllegalArgumentException("Description cannot be blank or shorter than 5 characters.");
             }
             this.description = trimmedDescription;
         }
         
         if (newDueDate != null) {
+            log.debug("[DOMAIN MUT] Evaluating target calendar date sequence adjustments. Current: {}, Proposed: {}", this.dueDate, newDueDate);
             if (this.dueDate.isAfter(newDueDate)) {
+                log.warn("[MUTATION REJECTED] Due date parameters must represent sequential calendar dates.");
                 throw new IllegalArgumentException("Extended due date must be after the current due date.");
             }
             this.dueDate = newDueDate;
         }
+        log.info("[DOMAIN MUT] All internal domain validation checks cleared. Modifications successfully applied.");
     }
     
     public void startTask(){
+        log.info("[DOMAIN ACT] Processing start task action execution loop. Business ID: {}", this.taskId);
         if(this.status == TaskStatus.IN_PROGRESS){
             throw new IllegalStateException("Task is already in progress");
         }
@@ -167,11 +186,12 @@ public class Task{
             throw new IllegalStateException("Task is cancelled, you does't want to start task");
         }
 
-        this.status=TaskStatus.IN_PROGRESS;
+        this.status = TaskStatus.IN_PROGRESS;
+        log.info("[DOMAIN ACT] Status transition complete. State updated to IN_PROGRESS.");
     }
 
     public TaskStatus completeTask(){
-
+        log.info("[DOMAIN ACT] Processing task completion transition sequence. Business ID: {}", this.taskId);
         if(this.status == TaskStatus.IS_COMPLETED){
             throw new IllegalStateException("Task is already completed");
         }
@@ -188,22 +208,25 @@ public class Task{
             previousStatus = TaskStatus.IN_PROGRESS;
         }
 
-        this.status=TaskStatus.IS_COMPLETED;
-        this.completionDate=Instant.now();
+        this.status = TaskStatus.IS_COMPLETED;
+        this.completionDate = Instant.now();
+        log.info("[DOMAIN ACT] Status transition complete. State locked to IS_COMPLETED.");
 
         return previousStatus;
     }
 
     public void cancelTask(){
-            if(this.status == TaskStatus.IN_PROGRESS)
-                throw new IllegalStateException("Cannot cancel the task which is in progress");
-            
-            if(this.status == TaskStatus.IS_COMPLETED)
-                throw new IllegalStateException("Cannot cancel the task which is completed");
+        log.info("[DOMAIN ACT] Processing structural cancel instructions block. Business ID: {}", this.taskId);
+        if(this.status == TaskStatus.IN_PROGRESS)
+            throw new IllegalStateException("Cannot cancel the task which is in progress");
+        
+        if(this.status == TaskStatus.IS_COMPLETED)
+            throw new IllegalStateException("Cannot cancel the task which is completed");
 
-            if(this.status == TaskStatus.CANCELLED)
-                throw new IllegalStateException("Task is already cancelled");
-            
-            this.status=TaskStatus.CANCELLED;
+        if(this.status == TaskStatus.CANCELLED)
+            throw new IllegalStateException("Task is already cancelled");
+        
+        this.status = TaskStatus.CANCELLED;
+        log.info("[DOMAIN ACT] Status transition complete. State dropped to CANCELLED.");
     }
 }

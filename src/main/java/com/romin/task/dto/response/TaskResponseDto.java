@@ -13,6 +13,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TaskResponseDto {
+    private final String publicId;
     private final String taskId;
     private final String title;
     private final String description;

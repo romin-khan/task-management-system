@@ -16,6 +16,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE+1)
 public class CoreGlobalExceptionHandler{
@@ -29,6 +32,7 @@ public class CoreGlobalExceptionHandler{
     @SuppressWarnings("null")
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleMalformedJson(HttpMessageNotReadableException ex) {
+        log.warn("[INFRA EXCEPTION] Incoming request dropped. Malformed JSON syntax structure intercepted.");
         return buildProblem(
                 HttpStatus.BAD_REQUEST,
                 "Malformed JSON Request",
@@ -42,6 +46,7 @@ public class CoreGlobalExceptionHandler{
     @SuppressWarnings("null")
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
     public ProblemDetail handleNotFound(Exception ex) {
+        log.warn("[INFRA EXCEPTION] Request routed to a non-existent endpoint path or static resource mapping.");
         return buildProblem(
                 HttpStatus.NOT_FOUND, 
                 "Route Not Found", 
@@ -55,6 +60,7 @@ public class CoreGlobalExceptionHandler{
     @SuppressWarnings("null")
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ProblemDetail handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        log.warn("[INFRA EXCEPTION] HTTP verb mismatch. Method '{}' not supported for this routing path.", ex.getMethod());
         return buildProblem(
                 HttpStatus.METHOD_NOT_ALLOWED, 
                 "Action Not Allowed", 
@@ -68,6 +74,7 @@ public class CoreGlobalExceptionHandler{
     @SuppressWarnings("null")
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ProblemDetail handleUnsupportedMedia(HttpMediaTypeNotSupportedException ex) {
+        log.warn("[INFRA EXCEPTION] Content-Type mapping rejected. Client provided unsupported media type: '{}'", ex.getContentType());
         return buildProblem(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE, 
                 "Unsupported Media Type", 
@@ -94,8 +101,9 @@ public class CoreGlobalExceptionHandler{
             message = rse.getReason();
             errorCode = "ERR_API_BAD_REQUEST";
             typeUri = TYPE_BAD_REQUEST;
+            log.warn("[INFRA EXCEPTION] ResponseStatusException intercepted. Status: {}, Reason: {}", status, message);
         } else {
-            ex.printStackTrace();
+            log.error("[CRITICAL FAILURE] Unhandled runtime exception or JVM crash intercepted at application perimeter.", ex);
         }
 
         return buildProblem(status, title, message, errorCode, typeUri, ex);
