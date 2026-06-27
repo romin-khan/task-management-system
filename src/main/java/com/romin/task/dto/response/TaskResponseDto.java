@@ -2,6 +2,7 @@ package com.romin.task.dto.response;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.romin.task.entity.TaskStatus;
 
@@ -13,7 +14,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TaskResponseDto {
-    private final String publicId;
+    private final UUID publicId;
     private final String taskId;
     private final String title;
     private final String description;

@@ -1,6 +1,7 @@
 package com.romin.task.service;
 
 import java.security.InvalidParameterException;
+import java.util.UUID;
 
 import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.TaskRequestDto;
@@ -67,7 +68,7 @@ public class TaskService {
 
     @SuppressWarnings("null")
     @Transactional
-    public void deleteTaskByPublicId(String publicId){
+    public void deleteTaskByPublicId(UUID publicId){
         log.info("[SERVICE] Processing delete task command. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -76,7 +77,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto update(UpdateRequestDto request, String publicId){
+    public TaskResponseDto update(UpdateRequestDto request, UUID publicId){
         log.info("[SERVICE] Executing partial update transaction. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -86,7 +87,7 @@ public class TaskService {
     }
     
     @Transactional
-    public TaskResponseDto cancelTask(String publicId){
+    public TaskResponseDto cancelTask(UUID publicId){
         log.info("[SERVICE] Executing cancel state transition. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -96,7 +97,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto startTask(String publicId){
+    public TaskResponseDto startTask(UUID publicId){
         log.info("[SERVICE] Executing start state transition. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -106,7 +107,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto completeTask(String publicId){
+    public TaskResponseDto completeTask(UUID publicId){
         log.info("[SERVICE] Executing completion state transition. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -115,7 +116,7 @@ public class TaskService {
         return mapToDto(task);
     }
     
-    public TaskResponseDto getTaskById(String publicId){
+    public TaskResponseDto getTaskById(UUID publicId){
         log.info("[SERVICE] Fetching individual task record by path token. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -132,7 +133,7 @@ public class TaskService {
         return PaginatedResponse.from(response);
     }
 
-    private Task getTaskOrThrow(String publicId){
+    private Task getTaskOrThrow(UUID publicId){
         if (publicId == null) {
             log.warn("[VALIDATION FAILED] Query lookup rejected because the public identifier string is null.");
             throw new TaskNotFoundException("Task cannot be found because the provided ID is null");

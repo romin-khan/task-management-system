@@ -1,6 +1,7 @@
 package com.romin.task.controller;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,7 +47,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{publicId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable String publicId){
+    public ResponseEntity<Void> deleteTask(@PathVariable UUID publicId){
         log.info("[HTTP DELETE] Incoming task delete request received. Public ID: {}", publicId);
         taskService.deleteTaskByPublicId(publicId);
 
@@ -55,7 +56,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{publicId}")
-    public ResponseEntity<TaskResponseDto> update(@PathVariable String publicId,
+    public ResponseEntity<TaskResponseDto> update(@PathVariable UUID publicId,
                                                   @Valid @RequestBody UpdateRequestDto request){
         log.info("[HTTP PATCH] Incoming task update request received. Public ID: {}, Payload: {}", publicId, request);
         TaskResponseDto response = taskService.update(request, publicId);
@@ -65,7 +66,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{publicId}/cancel")
-    public ResponseEntity<TaskResponseDto> cancelTask(@PathVariable String publicId){
+    public ResponseEntity<TaskResponseDto> cancelTask(@PathVariable UUID publicId){
         log.info("[HTTP PATCH] Incoming cancel task request received. Public ID: {}", publicId);
         TaskResponseDto response = taskService.cancelTask(publicId);
 
@@ -74,7 +75,7 @@ public class TaskController {
     }
 
     @GetMapping("/{publicId}")
-    public ResponseEntity<TaskResponseDto> getTask(@PathVariable String publicId){
+    public ResponseEntity<TaskResponseDto> getTask(@PathVariable UUID publicId){
          log.info("[HTTP GET] Incoming get task request received. Public ID: {}", publicId);
          TaskResponseDto response = taskService.getTaskById(publicId);
 
@@ -95,7 +96,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{publicId}/start")
-    public ResponseEntity<TaskResponseDto> startTask(@PathVariable String publicId){
+    public ResponseEntity<TaskResponseDto> startTask(@PathVariable UUID publicId){
         log.info("[HTTP PATCH] Incoming start task request received. Public ID: {}", publicId);
         TaskResponseDto response = taskService.startTask(publicId);
 
@@ -104,7 +105,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{publicId}/complete")
-    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable String publicId){
+    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable UUID publicId){
         log.info("[HTTP PATCH] Incoming complete task request received. Public ID: {}", publicId);
         TaskResponseDto response = taskService.completeTask(publicId);
 

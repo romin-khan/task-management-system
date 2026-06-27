@@ -4,6 +4,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.generator.EventType;
 
 import com.romin.infra.entity.BaseAuditEntity;
 import com.romin.user.entity.User;
@@ -40,7 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 @Table(
     name = "tasks",
     indexes = {
-        @Index(name = "idx_tasks_public_id", columnList = "publicId")
+        @Index(name = "idx_tasks_public_id", columnList = "public_id"),
+        @Index(name = "idx_tasks_assigned_to", columnList = "assigned_to"),
+        @Index(name = "idx_tasks_assigned_by", columnList = "assigned_by")
     },
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_tasks_public_id", columnNames = {"public_id"}),
@@ -67,11 +73,13 @@ public class Task extends BaseAuditEntity{
     @Column(name = "version", nullable = false)
     private Long version;
 
-    @Column(name = "task_id", nullable = false, updatable = false, length = 50)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "task_id", nullable = false, updatable = false, insertable = false, length = 50)
     private String taskId;
 
-    @Column(name = "public_id", nullable = false, updatable = false, length = 36)
-    private String publicId;
+    @Generated(event = EventType.INSERT)
+    @Column(name = "public_id", nullable = false, updatable = false, insertable = false, length = 36)
+    private UUID publicId;
 
     @NonNull
     @Column(nullable = false, length = 100)
@@ -83,12 +91,13 @@ public class Task extends BaseAuditEntity{
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private TaskStatus status;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "assigned_by_id",
+        name = "assigned_by",
         nullable = false,
         foreignKey = @ForeignKey(name = "fk_tasks_assigned_by_user"),
         referencedColumnName = "id"
@@ -98,7 +107,7 @@ public class Task extends BaseAuditEntity{
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "assigned_to_id",
+        name = "assigned_to",
         nullable = false,
         foreignKey = @ForeignKey(name = "fk_tasks_assigned_to_user"),
         referencedColumnName = "id"
@@ -115,22 +124,8 @@ public class Task extends BaseAuditEntity{
     @PrePersist
     public void init(){
         this.status = TaskStatus.NOT_STARTED;
-        this.publicId = UUID.randomUUID().toString();
 
-        int currentYear = LocalDate.now().getYear();
-        String deptName = "TECH";
-        String taskType = "BUG";
-        String uniqueSubSuffix = UUID.randomUUID().toString().substring(0, 3).toUpperCase();
-        
-        this.taskId = String.format("TSK-%d-%s-%s-%d-%s",
-                             currentYear,
-                             deptName,
-                             taskType,
-                             this.assignedBy.getId(),
-                             uniqueSubSuffix);
-        
-        log.info("[DOMAIN LCA] Lifecycle PrePersist hook executed. Generated publicId: {}, businessId: {}", 
-                 this.publicId, this.taskId);
+        log.info("[DOMAIN LCA] Lifecycle PrePersist hook executed");
     }
 
     public void markAsCompleted(){

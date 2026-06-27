@@ -48,7 +48,7 @@ class TaskPersistenceTest {
         assertNotNull(persistedTask.getId()); 
         assertNotNull(persistedTask.getTaskId()); 
         assertEquals(TaskStatus.NOT_STARTED, persistedTask.getStatus()); 
-        assertTrue(persistedTask.getTaskId().startsWith("TSK-2026-TECH-BUG-"));
+        assertTrue(persistedTask.getTaskId().startsWith("TSK-"));
     }
 
     private User createTestUser(String companyId, String name, String email, String phone) {
