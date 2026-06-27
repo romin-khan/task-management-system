@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 
 import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.TaskRequestDto;
-import com.romin.task.dto.request.UpdateRequest;
+import com.romin.task.dto.request.UpdateRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.entity.Task;
 
@@ -76,7 +76,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto update(UpdateRequest request, String publicId){
+    public TaskResponseDto update(UpdateRequestDto request, String publicId){
         log.info("[SERVICE] Executing partial update transaction. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -159,6 +159,7 @@ public class TaskService {
                               .dueDate(task.getDueDate())
                               .status(task.getStatus())
                               .title(task.getTitle())
+                              .updatedAt(task.getUpdatedAt())
                               .build();
     }
 }

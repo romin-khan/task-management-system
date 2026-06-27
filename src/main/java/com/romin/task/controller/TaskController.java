@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.TaskRequestDto;
-import com.romin.task.dto.request.UpdateRequest;
+import com.romin.task.dto.request.UpdateRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.service.TaskService;
 
@@ -56,7 +56,7 @@ public class TaskController {
 
     @PatchMapping("/{publicId}")
     public ResponseEntity<TaskResponseDto> update(@PathVariable String publicId,
-                                                  @Valid @RequestBody UpdateRequest request){
+                                                  @Valid @RequestBody UpdateRequestDto request){
         log.info("[HTTP PATCH] Incoming task update request received. Public ID: {}, Payload: {}", publicId, request);
         TaskResponseDto response = taskService.update(request, publicId);
 

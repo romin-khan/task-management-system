@@ -5,12 +5,12 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
 
-public record UpdateRequest(
+public record UpdateRequestDto(
 
     @Size(min = 3, max = 150, message = "Title must be between 3 and 150 characters if provided.")
     String title,
 
-    @Size(min = 5, max = 2000, message = "Description must be between 5 and 2000 characters.")
+    @Size(min = 5, message = "Description must be greater 5 characters.")
     String description,
 
     @FutureOrPresent(message = "Extended due date must be in the present or future.")
