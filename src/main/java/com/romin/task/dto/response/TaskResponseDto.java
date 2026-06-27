@@ -21,6 +21,7 @@ public class TaskResponseDto {
     private final Long assignedBy;
     private final Long assignedTo;
     private final Instant createdAt;
+    private final Instant updatedAt;
     private final LocalDate dueDate;
     private final Instant completionDate;
 }

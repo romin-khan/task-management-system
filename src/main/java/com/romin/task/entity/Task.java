@@ -4,10 +4,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.romin.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -15,11 +20,14 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +40,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Getter
 @Entity
-@Table(name = "tasks")
+@Table(
+    name = "tasks",
+    indexes = {
+        @Index(name = "idx_tasks_public_id", columnList = "publicId")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_tasks_public_id", columnNames = {"public_id"}),
+        @UniqueConstraint(name = "uk_tasks_task_id", columnNames = {"task_id"})
+    }
+
+)
 public class Task {
 
     @Id
@@ -48,10 +66,14 @@ public class Task {
     )
     private Long id;
 
-    @Column(name = "task_id", nullable = false, unique = true, length = 50)
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @Column(name = "task_id", nullable = false, updatable = false, length = 50)
     private String taskId;
 
-    @Column(name = "public_id", nullable = false, updatable = false, unique = true, length = 36)
+    @Column(name = "public_id", nullable = false, updatable = false, length = 36)
     private String publicId;
 
     @NonNull
@@ -86,19 +108,15 @@ public class Task {
     )
     private User assignedTo;
 
-    @Column(nullable = false)
-    private Instant createdAt;
-
-    @Column(nullable = true)
+    @Column(name = "completion_date", nullable = true)
     private Instant completionDate;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
     @PrePersist
     public void init(){
-        this.createdAt = Instant.now();
         this.status = TaskStatus.NOT_STARTED;
         this.publicId = UUID.randomUUID().toString();
 
@@ -148,7 +166,7 @@ public class Task {
         }
         
         if(newDescription != null){
-            log.debug("[DOMAIN MUT] Evaluating description phase adjustments against active lifecycles.");
+            log.debug("[DOMAIN MUT] Evaluating description phase adjustments against active lifecycle.");
             if(this.status != TaskStatus.NOT_STARTED){
                 log.warn("[MUTATION REJECTED] Description changes prohibited once task steps away from NOT_STARTED. Status: {}", this.status);
                 throw new IllegalStateException("Description cannot be changed after the task has started.");
