@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.lang.NonNull;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,7 @@ public class GlobalExceptionHandler {
     private static final URI TYPE_INVALID_STATE = URI.create("urn:problem-type:invalid-state-transition");
     private static final URI TYPE_VALIDATION_FAILED = URI.create("urn:problem-type:validation-failed");
     private static final URI TYPE_DATA_CONFLICT = URI.create("urn:problem-type:data-conflict");
+    private static final URI TYPE_CONCURRENCY_CONFLICT = URI.create("urn:problem-type:concurrency-conflict");
 
     @SuppressWarnings("null")
     @ExceptionHandler(TaskNotFoundException.class)
@@ -107,6 +109,21 @@ public class GlobalExceptionHandler {
                 "Data conflict: A resource with these unique identifiers already exists, or required fields are missing.",
                 "ERR_DATABASE_CONFLICT",
                 TYPE_DATA_CONFLICT
+        );
+    }
+
+    @SuppressWarnings("null")
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ProblemDetail handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException ex) {
+        log.warn("[EXCEPTION] Concurrency race condition intercepted. Resource entity update conflict. Type: {}", 
+                 ex.getPersistentClassName());
+                 
+        return buildProblem(
+                HttpStatus.CONFLICT, // 409 Conflict is the precise HTTP industry status code for locking failures
+                "Data Concurrency Conflict",
+                "The task resource you are trying to modify was updated by another session or user background execution block while you were viewing it. Please reload or re-fetch your client state payload and resubmit.",
+                "ERR_CONCURRENCY_CONFLICT",
+                TYPE_CONCURRENCY_CONFLICT
         );
     }
 
