@@ -1,7 +1,5 @@
 package com.romin.task.repository;
 
-import com.romin.task.entity.Task;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.romin.task.entity.Task;
 
 public interface TaskRepo extends JpaRepository<Task, Long>{
 

@@ -5,28 +5,22 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class TaskRequestDto {
+public record TaskRequestDto(
 
     @NotBlank(message = "Tittle should not be blank")
-    private String title;
+    String title,
 
     @NotBlank(message = "Description should not be blank")
-    private String description;
+    String description,
 
     @NotNull(message = "You have to specify your identity")
-    private Long assignedBy;
+    Long assignedBy,
 
     @NotNull(message = "You have to specify sender's identity")
-    private Long assignedTo;
+    Long assignedTo,
 
     @NotNull(message = "Due date should have some value")
     @FutureOrPresent(message = "Due date should be in present or future")
-    private LocalDate dueDate;
-}
+    LocalDate dueDate
+){}

@@ -12,33 +12,14 @@ import org.hibernate.generator.EventType;
 import com.romin.infra.entity.BaseAuditEntity;
 import com.romin.user.entity.User;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor
 @Getter
 @Entity
 @Table(
@@ -52,21 +33,12 @@ import lombok.extern.slf4j.Slf4j;
         @UniqueConstraint(name = "uk_tasks_public_id", columnNames = {"public_id"}),
         @UniqueConstraint(name = "uk_tasks_task_id", columnNames = {"task_id"})
     }
-
 )
-public class Task extends BaseAuditEntity{
+public class Task extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "task_id_generator"
-    )
-    @SequenceGenerator(
-        name = "task_id_generator",
-        sequenceName = "task_generator",
-        initialValue = 1,
-        allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id_generator")
+    @SequenceGenerator(name = "task_id_generator", sequenceName = "task_generator", allocationSize = 1)
     private Long id;
 
     @Version
@@ -81,11 +53,9 @@ public class Task extends BaseAuditEntity{
     @Column(name = "public_id", nullable = false, updatable = false, insertable = false, length = 36)
     private UUID publicId;
 
-    @NonNull
     @Column(nullable = false, length = 100)
     private String title;
 
-    @NonNull
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -94,149 +64,97 @@ public class Task extends BaseAuditEntity{
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private TaskStatus status;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "assigned_by",
-        nullable = false,
-        foreignKey = @ForeignKey(name = "fk_tasks_assigned_by_user"),
-        referencedColumnName = "id"
-    )
+    @JoinColumn(name = "assigned_by", nullable = false, foreignKey = @ForeignKey(name = "fk_tasks_assigned_by_user"))
     private User assignedBy;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "assigned_to",
-        nullable = false,
-        foreignKey = @ForeignKey(name = "fk_tasks_assigned_to_user"),
-        referencedColumnName = "id"
-    )
+    @JoinColumn(name = "assigned_to", nullable = false, foreignKey = @ForeignKey(name = "fk_tasks_assigned_to_user"))
     private User assignedTo;
 
-    @Column(name = "completion_date", nullable = true)
+    @Column(name = "completion_date")
     private Instant completionDate;
 
-    @NonNull
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+    public Task(String title, String description, User assignedBy, User assignedTo, LocalDate dueDate) {
+        if (title == null || title.trim().length() < 3) throw new IllegalArgumentException("Invalid title.");
+        if (description == null || description.trim().length() < 5) throw new IllegalArgumentException("Invalid description.");
+        if (assignedBy == null || assignedTo == null) throw new IllegalArgumentException("Users cannot be null.");
+        if (dueDate == null) throw new IllegalArgumentException("Due date cannot be null.");
+
+        this.title = title.trim();
+        this.description = description.trim();
+        this.assignedBy = assignedBy;
+        this.assignedTo = assignedTo;
+        this.dueDate = dueDate;
+         this.status = TaskStatus.NOT_STARTED;
+    }
+
     @PrePersist
-    public void init(){
-        this.status = TaskStatus.NOT_STARTED;
-
-        log.info("[DOMAIN LCA] Lifecycle PrePersist hook executed");
+    protected void onPersist() {
+        log.debug("[DB-LIFECYCLE] Persisting Task Aggregate: {}", this.taskId);
     }
 
-    public void markAsCompleted(){
-        log.info("[DOMAIN ACT] Explicit marking complete command invoked. Business ID: {}", this.taskId);
-        this.completionDate = Instant.now();
-        this.status = TaskStatus.IS_COMPLETED;
-    }
-
-    public void update(String newDescription, LocalDate newDueDate, String newTitle){
-        log.info("[DOMAIN MUT] Processing update validation loop. Current Status: {}, Business ID: {}", this.status, this.taskId);
+    public void update(String newTitle, String newDescription, LocalDate newDueDate) {
+        ensureTaskIsModifiable();
         
-        if(this.status == TaskStatus.IS_COMPLETED){
-            log.warn("[MUTATION REJECTED] Cannot modify a task that is already completed. Business ID: {}", this.taskId);
-            throw new IllegalStateException("Cannot modify a task that is already completed.");
-        }
-        if(this.status == TaskStatus.CANCELLED){
-            log.warn("[MUTATION REJECTED] Cannot modify a cancelled task. Business ID: {}", this.taskId);
-            throw new IllegalStateException("Cannot modify a cancelled task.");
-        }
-
-        if(newTitle != null){
+        if (newTitle != null) {
             String trimmedTitle = newTitle.trim();
-            log.debug("[DOMAIN MUT] Evaluating title payload string properties.");
-            
-            if (trimmedTitle.isEmpty() || trimmedTitle.length() < 3) {
-                log.warn("[MUTATION REJECTED] Title payload criteria breach. Input length under threshold.");
-                throw new IllegalArgumentException("Title cannot be blank or shorter than 3 characters.");
-            }
+            if (trimmedTitle.length() < 3) throw new IllegalArgumentException("Title must be at least 3 characters.");
             this.title = trimmedTitle;
         }
         
-        if(newDescription != null){
-            log.debug("[DOMAIN MUT] Evaluating description phase adjustments against active lifecycle.");
-            if(this.status != TaskStatus.NOT_STARTED){
-                log.warn("[MUTATION REJECTED] Description changes prohibited once task steps away from NOT_STARTED. Status: {}", this.status);
-                throw new IllegalStateException("Description cannot be changed after the task has started.");
+        if (newDescription != null) {
+            if (this.status != TaskStatus.NOT_STARTED) {
+                throw new IllegalStateException("Description can only be changed if the task has not started.");
             }
-
             String trimmedDescription = newDescription.trim();
-
-            if (trimmedDescription.isEmpty() || trimmedDescription.length() < 5) {
-                log.warn("[MUTATION REJECTED] Description length check failed. Provided input text is too short.");
-                throw new IllegalArgumentException("Description cannot be blank or shorter than 5 characters.");
+            if (trimmedDescription.length() < 5) {
+                throw new IllegalArgumentException("Description must be at least 5 characters.");
             }
             this.description = trimmedDescription;
         }
         
         if (newDueDate != null) {
-            log.debug("[DOMAIN MUT] Evaluating target calendar date sequence adjustments. Current: {}, Proposed: {}", this.dueDate, newDueDate);
-            if (this.dueDate.isAfter(newDueDate)) {
-                log.warn("[MUTATION REJECTED] Due date parameters must represent sequential calendar dates.");
-                throw new IllegalArgumentException("Extended due date must be after the current due date.");
+            if (newDueDate.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("New due date cannot be earlier than the current date.");
             }
             this.dueDate = newDueDate;
         }
-        log.info("[DOMAIN MUT] All internal domain validation checks cleared. Modifications successfully applied.");
     }
-    
-    public void startTask(){
-        log.info("[DOMAIN ACT] Processing start task action execution loop. Business ID: {}", this.taskId);
-        if(this.status == TaskStatus.IN_PROGRESS){
-            throw new IllegalStateException("Task is already in progress");
-        }
-        if(this.status == TaskStatus.IS_COMPLETED){
-            throw new IllegalStateException("Task is already completed");
-        }
-        if(this.status == TaskStatus.CANCELLED){
-            throw new IllegalStateException("Task is cancelled, you does't want to start task");
-        }
 
+    public void start() {
+        if (this.status == TaskStatus.IN_PROGRESS) return; // Idempotent
+        if (this.status != TaskStatus.NOT_STARTED) {
+            throw new IllegalStateException("Cannot start a task that is " + this.status);
+        }
         this.status = TaskStatus.IN_PROGRESS;
-        log.info("[DOMAIN ACT] Status transition complete. State updated to IN_PROGRESS.");
     }
 
-    public TaskStatus completeTask(){
-        log.info("[DOMAIN ACT] Processing task completion transition sequence. Business ID: {}", this.taskId);
-        if(this.status == TaskStatus.IS_COMPLETED){
-            throw new IllegalStateException("Task is already completed");
+    public void complete() {
+        if (this.status == TaskStatus.IS_COMPLETED) return; // Idempotent
+        if (this.status == TaskStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot complete a cancelled task.");
         }
         
-        TaskStatus previousStatus;
-
-        if(this.status == TaskStatus.CANCELLED){
-            previousStatus = TaskStatus.CANCELLED;
-        }
-        else if(this.status == TaskStatus.NOT_STARTED){
-            previousStatus = TaskStatus.NOT_STARTED;
-        }
-        else{
-            previousStatus = TaskStatus.IN_PROGRESS;
-        }
-
         this.status = TaskStatus.IS_COMPLETED;
         this.completionDate = Instant.now();
-        log.info("[DOMAIN ACT] Status transition complete. State locked to IS_COMPLETED.");
-
-        return previousStatus;
     }
 
-    public void cancelTask(){
-        log.info("[DOMAIN ACT] Processing structural cancel instructions block. Business ID: {}", this.taskId);
-        if(this.status == TaskStatus.IN_PROGRESS)
-            throw new IllegalStateException("Cannot cancel the task which is in progress");
-        
-        if(this.status == TaskStatus.IS_COMPLETED)
-            throw new IllegalStateException("Cannot cancel the task which is completed");
-
-        if(this.status == TaskStatus.CANCELLED)
-            throw new IllegalStateException("Task is already cancelled");
+    public void cancel() {
+        if (this.status == TaskStatus.CANCELLED) return; // Idempotent
+        if (this.status == TaskStatus.IS_COMPLETED) {
+            throw new IllegalStateException("Cannot cancel a completed task.");
+        }
         
         this.status = TaskStatus.CANCELLED;
-        log.info("[DOMAIN ACT] Status transition complete. State dropped to CANCELLED.");
+    }
+
+    private void ensureTaskIsModifiable() {
+        if (this.status == TaskStatus.IS_COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot modify a closed task (Completed/Cancelled).");
+        }
     }
 }

@@ -42,7 +42,7 @@ public class TaskController {
         log.info("[HTTP POST] Incoming task creation request received. Payload: {}", request);
         TaskResponseDto response = taskService.createTask(request);
 
-        log.info("[HTTP 201] Task successfully created. Public ID: {}", response.getPublicId());
+        log.info("[HTTP 201] Task successfully created. Public ID: {}", response.publicId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

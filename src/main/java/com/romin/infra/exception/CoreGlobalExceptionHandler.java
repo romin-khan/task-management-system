@@ -29,7 +29,6 @@ public class CoreGlobalExceptionHandler{
     private static final URI TYPE_UNSUPPORTED_MEDIA = URI.create("urn:problem-type:unsupported-media");
     private static final URI TYPE_INTERNAL_SERVER_ERROR = URI.create("urn:problem-type:internal-server-error");
 
-    @SuppressWarnings("null")
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleMalformedJson(HttpMessageNotReadableException ex) {
         log.warn("[INFRA EXCEPTION] Incoming request dropped. Malformed JSON syntax structure intercepted.");
@@ -43,7 +42,6 @@ public class CoreGlobalExceptionHandler{
         );
     }
 
-    @SuppressWarnings("null")
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
     public ProblemDetail handleNotFound(Exception ex) {
         log.warn("[INFRA EXCEPTION] Request routed to a non-existent endpoint path or static resource mapping.");
@@ -57,7 +55,6 @@ public class CoreGlobalExceptionHandler{
         );
     }
 
-    @SuppressWarnings("null")
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ProblemDetail handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
         log.warn("[INFRA EXCEPTION] HTTP verb mismatch. Method '{}' not supported for this routing path.", ex.getMethod());
@@ -71,7 +68,6 @@ public class CoreGlobalExceptionHandler{
         );
     }
 
-    @SuppressWarnings("null")
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ProblemDetail handleUnsupportedMedia(HttpMediaTypeNotSupportedException ex) {
         log.warn("[INFRA EXCEPTION] Content-Type mapping rejected. Client provided unsupported media type: '{}'", ex.getContentType());
@@ -86,7 +82,6 @@ public class CoreGlobalExceptionHandler{
     }
 
     // Handle Server Issues (500 Internal Server Boundary - Runtime/JVM Crashes)
-    @SuppressWarnings("null")
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllRemainingErrors(Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
