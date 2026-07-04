@@ -1,8 +1,8 @@
 com/romin/user/enums/Role.class
 com/romin/task/entity/Task.class
 com/romin/infra/dto/PaginatedResponse.class
-com/romin/task/dto/request/DescriptionRequest.class
-com/romin/task/dto/request/DueDateRequest.class
+com/romin/infra/entity/BaseAuditEntity.class
+com/romin/task/mapper/TaskMapper.class
 com/romin/user/entity/User.class
 com/romin/task/dto/response/TaskResponseDto.class
 com/romin/task/controller/TaskController.class
@@ -14,7 +14,8 @@ com/romin/task/repository/TaskRepo.class
 com/romin/infra/exception/CoreGlobalExceptionHandler.class
 com/romin/TaskManagementApplication.class
 com/romin/user/repository/UserRepo.class
+com/romin/task/mapper/TaskMapperImpl.class
 com/romin/task/exception/TaskNotFoundException.class
-com/romin/task/dto/response/TaskResponseDto$TaskResponseDtoBuilder.class
+com/romin/task/dto/request/UpdateRequestDto.class
 com/romin/user/enums/Position.class
 com/romin/task/dto/request/TaskRequestDto.class

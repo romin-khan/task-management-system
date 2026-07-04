@@ -1,6 +1,5 @@
 package com.romin.task.service;
 
-import java.security.InvalidParameterException;
 import java.util.UUID;
 
 import com.romin.infra.dto.PaginatedResponse;
@@ -38,13 +37,13 @@ public class TaskService {
         log.info("[SERVICE] Initiating task creation. AssignedBy: {}, AssignedTo: {}", request.assignedBy(), request.assignedTo());
 
         User assignedBy = userRepo.findById(request.assignedBy())
-            .orElseThrow(() -> new InvalidParameterException("User not found with id: " + request.assignedBy()));
+            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + request.assignedBy()));
             
         User assignedTo = userRepo.findById(request.assignedTo())
-            .orElseThrow(() -> new InvalidParameterException("User not found with id: " + request.assignedTo()));
+            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + request.assignedTo()));
 
         Task task = taskMapper.toEntity(request, assignedBy , assignedTo);
-        Task savedTask = taskRepo.save(task);                     
+        Task savedTask = taskRepo.save(task);
         
         return taskMapper.toResponseDto(savedTask);
     }
@@ -57,7 +56,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto update(UpdateRequestDto request, UUID publicId) {
+    public TaskResponseDto updateTask(UpdateRequestDto request, UUID publicId) {
         log.info("[SERVICE] Executing partial update transaction. Public ID: {}", publicId);
         Task task = getTaskOrThrow(publicId);
         
@@ -99,7 +98,7 @@ public class TaskService {
     }
     
     public PaginatedResponse<TaskResponseDto> getAllTask(@NonNull Pageable pageable) {
-        Page<TaskResponseDto> response = taskRepo.findAll(pageable).map(taskMapper::toResponseDto);
+        Page<TaskResponseDto> response = taskRepo.findAllTasksWithUsers(pageable).map(taskMapper::toResponseDto);
         return PaginatedResponse.from(response);
     }
 

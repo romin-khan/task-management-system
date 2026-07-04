@@ -1,1 +1,2 @@
-com/romin/TaskPersistenceTest.class
+com/romin/task/service/TaskServiceTest.class
+com/romin/task/service/TaskServiceTest$createTask.class

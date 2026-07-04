@@ -59,7 +59,7 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> update(@PathVariable UUID publicId,
                                                   @Valid @RequestBody UpdateRequestDto request){
         log.info("[HTTP PATCH] Incoming task update request received. Public ID: {}, Payload: {}", publicId, request);
-        TaskResponseDto response = taskService.update(request, publicId);
+        TaskResponseDto response = taskService.updateTask(request, publicId);
 
         log.info("[HTTP 200] Task updated successfully. Public ID: {}", publicId);
         return ResponseEntity.ok(response);
