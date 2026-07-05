@@ -79,6 +79,7 @@ public class Task extends BaseAuditEntity {
     private LocalDate dueDate;
 
     public Task(String title, String description, User assignedBy, User assignedTo, LocalDate dueDate) {
+
         if (title == null || title.trim().length() < 3) throw new IllegalArgumentException("Invalid title.");
         if (description == null || description.trim().length() < 5) throw new IllegalArgumentException("Invalid description.");
         if (assignedBy == null || assignedTo == null) throw new IllegalArgumentException("Users cannot be null.");
@@ -89,7 +90,7 @@ public class Task extends BaseAuditEntity {
         this.assignedBy = assignedBy;
         this.assignedTo = assignedTo;
         this.dueDate = dueDate;
-         this.status = TaskStatus.NOT_STARTED;
+        this.status = TaskStatus.NOT_STARTED;
     }
 
     @PrePersist
@@ -98,6 +99,7 @@ public class Task extends BaseAuditEntity {
     }
 
     public void update(String newTitle, String newDescription, LocalDate newDueDate) {
+        
         ensureTaskIsModifiable();
         
         if (newTitle != null) {
