@@ -130,7 +130,7 @@ public class Task extends BaseAuditEntity {
     public void start() {
         if (this.status == TaskStatus.IN_PROGRESS) return; // Idempotent
         if (this.status != TaskStatus.NOT_STARTED) {
-            throw new IllegalStateException("Cannot start a task that is " + this.status);
+            throw new IllegalStateException("Cannot start a completed/cancelled task");
         }
         this.status = TaskStatus.IN_PROGRESS;
     }
