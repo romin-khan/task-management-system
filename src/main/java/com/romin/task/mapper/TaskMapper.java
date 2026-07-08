@@ -22,7 +22,7 @@ public interface TaskMapper {
     @Mapping(target = "taskId", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "completionDate", ignore = true)
-    @Mapping(target = "assignedBy", ignore = true)
-    @Mapping(target = "assignedTo", ignore = true)
+    @Mapping(target = "assignedBy", source = "assignedBy")
+    @Mapping(target = "assignedTo", source = "assignedTo")
     Task toEntity(TaskRequestDto request, User assignedBy, User assignedTo);
 }

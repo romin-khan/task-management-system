@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-04T03:06:06+0530",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-07-07T00:29:14+0530",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
 )
 @Component
 public class TaskMapperImpl implements TaskMapper {
@@ -68,9 +68,10 @@ public class TaskMapperImpl implements TaskMapper {
             description = request.description();
             dueDate = request.dueDate();
         }
-
         User assignedBy1 = null;
+        assignedBy1 = assignedBy;
         User assignedTo1 = null;
+        assignedTo1 = assignedTo;
 
         Task task = new Task( title, description, assignedBy1, assignedTo1, dueDate );
 
