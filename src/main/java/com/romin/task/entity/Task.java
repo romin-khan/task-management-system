@@ -2,6 +2,7 @@ package com.romin.task.entity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.hibernate.annotations.Generated;
@@ -120,7 +121,7 @@ public class Task extends BaseAuditEntity {
         }
         
         if (newDueDate != null) {
-            if (newDueDate.isBefore(LocalDate.now())) {
+            if (newDueDate.isBefore(LocalDate.now(ZoneOffset.UTC))) {
                 throw new IllegalArgumentException("New due date cannot be earlier than the current date.");
             }
             this.dueDate = newDueDate;
