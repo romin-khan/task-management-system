@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 import com.romin.task.entity.Task;
 import com.romin.user.enums.Position;
 import com.romin.user.enums.Role;
@@ -93,6 +96,7 @@ public class User {
         length = 30
     )
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Role role;
 
     @Column(
@@ -101,6 +105,7 @@ public class User {
         length = 50
     )
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Position position;
 
     @Column(
@@ -109,6 +114,7 @@ public class User {
         length = 20
     )
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Status status;
 
     @Column(

@@ -1,1 +1,4 @@
+/home/alikhan/task_management/src/test/java/com/romin/task/entity/TaskEntityTest.java
+/home/alikhan/task_management/src/test/java/com/romin/task/mapper/TaskMapperTest.java
+/home/alikhan/task_management/src/test/java/com/romin/task/repository/TaskRepoTests.java
 /home/alikhan/task_management/src/test/java/com/romin/task/service/TaskServiceTest.java

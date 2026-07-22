@@ -16,14 +16,14 @@ import com.romin.user.enums.Position;
 import com.romin.user.enums.Role;
 import com.romin.user.enums.Status;
 
-public class TaskMapperTest{
+class TaskMapperTest{
 
     private User user1;
     private User user2;
     private TaskMapperImpl mapper;
 
     @BeforeEach
-    public void setUp(){
+    void setUp(){
         mapper = new TaskMapperImpl();
 
         user1 = new User(
@@ -64,7 +64,7 @@ public class TaskMapperTest{
     }
     
     @Test
-    public void toEntity_WhenPassedValidRequestAndUsers_ShouldReturnMappedTask(){
+    void toEntity_WhenPassedValidRequestAndUsers_ShouldReturnMappedTask(){
         LocalDate dueDate = LocalDate.now();
         TaskRequestDto request = new TaskRequestDto(
             "Title",
@@ -85,7 +85,7 @@ public class TaskMapperTest{
     }
 
     @Test
-    public void toResponse_WhenPassedValidEntity_ShouldReturnResponseDto(){
+    void toResponse_WhenPassedValidEntity_ShouldReturnResponseDto(){
         LocalDate dueDate = LocalDate.now();
         Task task = new Task(
             "Title",

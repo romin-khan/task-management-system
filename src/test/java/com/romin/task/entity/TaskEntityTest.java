@@ -18,7 +18,7 @@ import com.romin.user.enums.Position;
 import com.romin.user.enums.Role;
 import com.romin.user.enums.Status;
 
-public class TaskEntityTest{
+class TaskEntityTest{
 
     private User user1;
     private User user2;
@@ -28,7 +28,7 @@ public class TaskEntityTest{
     private LocalDate dueDate;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         title = "Bug fix";
         description = "Fix DB Indexing";
@@ -69,7 +69,7 @@ public class TaskEntityTest{
     class UpdateTest{
 
         @Test
-        public void update_WhenPassedAllValidFields_ShouldUpdateSuccessfully(){
+        void update_WhenPassedAllValidFields_ShouldUpdateSuccessfully(){
             LocalDate updatedDueDate = LocalDate.now().plusDays(5);
 
             task.update(
@@ -84,19 +84,20 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void update_WhenPassedAllNullFields_ShouldNotChangeAnyStateOfTask(){
+        void update_WhenPassedAllNullFields_ShouldNotChangeAnyStateOfTask(){
             task.update(null, null, null);
 
             assertStateUnchanged();
         }
 
         @Test
-        public void update_WhenTaskIsCancelled_ShouldThrowException(){
+        void update_WhenTaskIsCancelled_ShouldThrowException(){
             task.cancel();
 
+            LocalDate futureDate = LocalDate.now().plusDays(5);
             Exception exception = assertThrows(
                 IllegalStateException.class,
-                () -> task.update("New Title", "New Description", LocalDate.now().plusDays(5))
+                () -> task.update("New Title", "New Description", futureDate)
             );
 
             assertEquals("Cannot modify a closed task (Completed/Cancelled).", exception.getMessage());
@@ -104,12 +105,13 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void update_WhenTaskIsCompleted_ShouldThrowException(){
+        void update_WhenTaskIsCompleted_ShouldThrowException(){
             task.complete();
 
+            LocalDate futureDate = LocalDate.now().plusDays(5);
             Exception exception = assertThrows(
                 IllegalStateException.class,
-                () -> task.update("New Title", "New Description", LocalDate.now().plusDays(5))
+                () -> task.update("New Title", "New Description", futureDate)
             );
 
             assertEquals("Cannot modify a closed task (Completed/Cancelled).", exception.getMessage());
@@ -117,7 +119,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateTitle_WhenPassedInvalidTitle_ShouldThrowException(){
+        void updateTitle_WhenPassedInvalidTitle_ShouldThrowException(){
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> task.update("  ab  ", null, null)
@@ -128,7 +130,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateTitle_WhenPassedValidTitle_ShouldUpdateSuccessfully(){
+        void updateTitle_WhenPassedValidTitle_ShouldUpdateSuccessfully(){
             String expectedDescription = task.getDescription();
             LocalDate expectedDueDate = task.getDueDate();
 
@@ -140,7 +142,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateTitle_WhenPassedBlankTitle_ShouldThrowException(){
+        void updateTitle_WhenPassedBlankTitle_ShouldThrowException(){
             String currentTitle = task.getTitle();
             var ex = assertThrows(
                 IllegalArgumentException.class,
@@ -152,7 +154,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateDescription_WhenPassedInvalidDescription_ShouldThrowException(){
+        void updateDescription_WhenPassedInvalidDescription_ShouldThrowException(){
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> task.update(null, " ab ", null)
@@ -163,7 +165,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateDescription_WhenTaskIsInProgress_ShouldThrowException(){
+        void updateDescription_WhenTaskIsInProgress_ShouldThrowException(){
             task.start();
 
             Exception exception = assertThrows(
@@ -176,7 +178,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateDescription_WhenPassedValidDescription_ShouldUpdateSuccessfully(){
+        void updateDescription_WhenPassedValidDescription_ShouldUpdateSuccessfully(){
             String expectedTitle = task.getTitle();
             LocalDate expectedDueDate = task.getDueDate();
 
@@ -188,7 +190,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void updateTitle_WhenPassedBlankDescription_ShouldThrowException(){
+        void updateTitle_WhenPassedBlankDescription_ShouldThrowException(){
             String currentDescription = task.getDescription();
             var ex = assertThrows(
                 IllegalArgumentException.class,
@@ -200,10 +202,11 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void update_WhenPassedInvalidDueDate_ShouldThrowException(){
+        void update_WhenPassedInvalidDueDate_ShouldThrowException(){
+            LocalDate futureDate = LocalDate.now().minusDays(3);
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> task.update(null, null, LocalDate.now().minusDays(3)
+                () -> task.update(null, null, futureDate
                 )
             );
 
@@ -211,7 +214,7 @@ public class TaskEntityTest{
             assertStateUnchanged();
         }
         @Test
-        public void updateDueDate_WhenPassedValidDueDate_ShouldUpdateSuccessfully(){
+        void updateDueDate_WhenPassedValidDueDate_ShouldUpdateSuccessfully(){
             String expectedTitle = task.getTitle();
             String expectedDescription = task.getDescription();
             LocalDate expectedDueDate = LocalDate.now().plusDays(5);
@@ -228,14 +231,14 @@ public class TaskEntityTest{
     class StartTest{
 
         @Test
-        public void start_WhenTaskIsNotStarted_ShouldChangeStateToInProgress(){
+        void start_WhenTaskIsNotStarted_ShouldChangeStateToInProgress(){
             task.start();
 
             assertEquals(TaskStatus.IN_PROGRESS, task.getStatus());
         }
 
         @Test
-        public void start_WhenTaskIsAlreadyInProgress_ShouldDoNothing(){
+        void start_WhenTaskIsAlreadyInProgress_ShouldDoNothing(){
             task.start();
             task.start();
 
@@ -243,7 +246,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void start_WhenTaskIsCancelled_ShouldThrowException(){
+        void start_WhenTaskIsCancelled_ShouldThrowException(){
             task.cancel();
 
             var ex = assertThrows(
@@ -256,7 +259,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void start_WhenTaskIsCompleted_ShouldThrowException(){
+        void start_WhenTaskIsCompleted_ShouldThrowException(){
             task.complete();
 
             var ex = assertThrows(
@@ -273,7 +276,7 @@ public class TaskEntityTest{
     class CompleteTest {
 
         @Test
-        public void complete_WhenTaskIsNotStarted_ShouldChangeStateToCompletedAndSetCompletionDate() {
+        void complete_WhenTaskIsNotStarted_ShouldChangeStateToCompletedAndSetCompletionDate() {
             task.complete();
 
             assertEquals(TaskStatus.IS_COMPLETED, task.getStatus());
@@ -281,7 +284,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void complete_WhenTaskIsInProgress_ShouldChangeStateToCompletedAndSetCompletionDate() {
+        void complete_WhenTaskIsInProgress_ShouldChangeStateToCompletedAndSetCompletionDate() {
             task.start();
 
             task.complete();
@@ -291,7 +294,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void complete_WhenTaskIsAlreadyCompleted_ShouldDoNothing() {
+        void complete_WhenTaskIsAlreadyCompleted_ShouldDoNothing() {
             task.complete();
             Instant firstCompletionDate = task.getCompletionDate();
 
@@ -302,7 +305,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void complete_WhenTaskIsCancelled_ShouldThrowException() {
+        void complete_WhenTaskIsCancelled_ShouldThrowException() {
             task.cancel();
 
             Exception exception = assertThrows(
@@ -320,14 +323,14 @@ public class TaskEntityTest{
     class CancelTest {
 
         @Test
-        public void cancel_WhenTaskIsNotStarted_ShouldChangeStateToCancelled() {
+        void cancel_WhenTaskIsNotStarted_ShouldChangeStateToCancelled() {
             task.cancel();
 
             assertEquals(TaskStatus.CANCELLED, task.getStatus());
         }
 
         @Test
-        public void cancel_WhenTaskIsInProgress_ShouldChangeStateToCancelled() {
+        void cancel_WhenTaskIsInProgress_ShouldChangeStateToCancelled() {
             task.start();
 
             task.cancel();
@@ -336,7 +339,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void cancel_WhenTaskIsAlreadyCancelled_ShouldDoNothing() {
+        void cancel_WhenTaskIsAlreadyCancelled_ShouldDoNothing() {
             task.cancel();
             task.cancel();
 
@@ -344,7 +347,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void cancel_WhenTaskIsCompleted_ShouldThrowException() {
+        void cancel_WhenTaskIsCompleted_ShouldThrowException() {
             task.complete();
 
             Exception exception = assertThrows(
@@ -362,8 +365,8 @@ public class TaskEntityTest{
     class ConstructorTests {
 
         @Test
-        public void constructor_WhenPassedValidFields_ShouldCreateTaskSuccessfully() {
-            Task task = new Task(
+        void constructor_WhenPassedValidFields_ShouldCreateTaskSuccessfully() {
+            Task createTask = new Task(
                 "Bug fix",
                 "Fix DB indexing issue",
                 user1,
@@ -371,17 +374,17 @@ public class TaskEntityTest{
                 dueDate
             );
 
-            assertEquals("Bug fix", task.getTitle());
-            assertEquals("Fix DB indexing issue", task.getDescription());
-            assertSame(user1, task.getAssignedBy());
-            assertSame(user2, task.getAssignedTo());
-            assertEquals(dueDate, task.getDueDate());
-            assertEquals(TaskStatus.NOT_STARTED, task.getStatus());
+            assertEquals("Bug fix", createTask.getTitle());
+            assertEquals("Fix DB indexing issue", createTask.getDescription());
+            assertSame(user1, createTask.getAssignedBy());
+            assertSame(user2, createTask.getAssignedTo());
+            assertEquals(dueDate, createTask.getDueDate());
+            assertEquals(TaskStatus.NOT_STARTED, createTask.getStatus());
         }
 
         @Test
-        public void constructor_WhenTitleAndDescriptionContainExtraSpaces_ShouldTrimAndCreateTask() {
-            Task task = new Task(
+        void constructor_WhenTitleAndDescriptionContainExtraSpaces_ShouldTrimAndCreateTask() {
+            Task createTask = new Task(
                 "  Bug fix  ",
                 "  Fix DB indexing issue  ",
                 user1,
@@ -389,16 +392,16 @@ public class TaskEntityTest{
                 dueDate
             );
 
-            assertEquals("Bug fix", task.getTitle());
-            assertEquals("Fix DB indexing issue", task.getDescription());
-            assertSame(user1, task.getAssignedBy());
-            assertSame(user2, task.getAssignedTo());
-            assertEquals(dueDate, task.getDueDate());
-            assertEquals(TaskStatus.NOT_STARTED, task.getStatus());
+            assertEquals("Bug fix", createTask.getTitle());
+            assertEquals("Fix DB indexing issue", createTask.getDescription());
+            assertSame(user1, createTask.getAssignedBy());
+            assertSame(user2, createTask.getAssignedTo());
+            assertEquals(dueDate, createTask.getDueDate());
+            assertEquals(TaskStatus.NOT_STARTED, createTask.getStatus());
         }
 
         @Test
-        public void constructor_WhenTitleIsNull_ShouldThrowException() {
+        void constructor_WhenTitleIsNull_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task(null, "Valid description", user1, user2, dueDate)
@@ -408,7 +411,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenTitleIsLessThanThreeCharactersAfterTrim_ShouldThrowException() {
+        void constructor_WhenTitleIsLessThanThreeCharactersAfterTrim_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task(" ab ", "Valid description", user1, user2, dueDate)
@@ -418,7 +421,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenDescriptionIsNull_ShouldThrowException() {
+        void constructor_WhenDescriptionIsNull_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task("Valid title", null, user1, user2, dueDate)
@@ -428,7 +431,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenDescriptionIsLessThanFiveCharactersAfterTrim_ShouldThrowException() {
+        void constructor_WhenDescriptionIsLessThanFiveCharactersAfterTrim_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task("Valid title", " abcd ", user1, user2, dueDate)
@@ -438,7 +441,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenAssignedByIsNull_ShouldThrowException() {
+        void constructor_WhenAssignedByIsNull_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task("Valid title", "Valid description", null, user2, dueDate)
@@ -448,7 +451,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenAssignedToIsNull_ShouldThrowException() {
+        void constructor_WhenAssignedToIsNull_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task("Valid title", "Valid description", user1, null, dueDate)
@@ -458,7 +461,7 @@ public class TaskEntityTest{
         }
 
         @Test
-        public void constructor_WhenDueDateIsNull_ShouldThrowException() {
+        void constructor_WhenDueDateIsNull_ShouldThrowException() {
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Task("Valid title", "Valid description", user1, user2, null)

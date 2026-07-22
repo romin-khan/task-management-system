@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.romin.task.service.TaskServiceTest" time="5.136" tests="23" errors="0" skipped="0" failures="0" flakes="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.romin.task.repository.TaskRepoTests" time="28.269" tests="5" errors="0" skipped="0" failures="0" flakes="0">
   <properties>
     <property name="spring.flyway.enabled" value="true"/>
     <property name="java.specification.version" value="21"/>
@@ -9,6 +9,7 @@
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://adoptium.net/"/>
     <property name="user.timezone" value="Asia/Calcutta"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
     <property name="os.name" value="Linux"/>
     <property name="java.vm.specification.version" value="21"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
@@ -29,7 +30,10 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
     <property name="surefire.real.class.path" value="/home/alikhan/task_management/target/surefire/surefirebooter-20260715211701989_3.jar"/>
+    <property name="polyglot.engine.WarnInterpreterOnly" value="false"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.10+7-LTS"/>
     <property name="user.name" value="alikhan"/>
@@ -43,10 +47,13 @@
     <property name="localRepository" value="/home/alikhan/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
     <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
     <property name="java.version" value="21.0.10"/>
     <property name="user.dir" value="/home/alikhan/task_management"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="7215"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
@@ -56,87 +63,102 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="cancelTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="3.602">
-    <system-out><![CDATA[21:17:08.311 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: null
-]]></system-out>
-    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-WARNING: A Java agent has been loaded dynamically (/home/alikhan/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar)
-WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
-WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
-WARNING: Dynamic loading of agents will be disallowed by default in a future release
-]]></system-err>
-  </testcase>
-  <testcase name="cancelTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="0.188">
-    <system-out><![CDATA[21:17:08.521 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: 0b00319f-3bbe-4098-8c9d-9ecaa22f212e
-]]></system-out>
-  </testcase>
-  <testcase name="cancelTask_WhenTaskExists_CancelsTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="0.078">
-    <system-out><![CDATA[21:17:08.620 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: 08297962-bf31-486c-8b45-411967ed4444
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenTaskExists_CompletesTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.051">
-    <system-out><![CDATA[21:17:08.766 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: 7040b081-225e-4547-87d5-0fcf9698bd61
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.047">
-    <system-out><![CDATA[21:17:08.823 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: a489dfd3-e222-4b11-aa08-173db5857dee
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.041">
-    <system-out><![CDATA[21:17:08.872 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenAssigneeIsNotPresent" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.078">
-    <system-out><![CDATA[21:17:08.984 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="createTask_WhenAssignerAndAssigneeIsPresent_ReturnResponseDto" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.061">
-    <system-out><![CDATA[21:17:09.053 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenAssignerIsNotPresent" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.042">
-    <system-out><![CDATA[21:17:09.113 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenPassedANullId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.06">
-    <system-out><![CDATA[21:17:09.215 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenPassedAnInvalidId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.056">
-    <system-out><![CDATA[21:17:09.270 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: f82d808f-2e92-4e95-b7dd-e0803e08f1b7
-]]></system-out>
-  </testcase>
-  <testcase name="deleteTask_WhenPassedAValidId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.027">
-    <system-out><![CDATA[21:17:09.311 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: 7de2f53e-2a44-46dd-ad0c-0e111ffa25d9
-]]></system-out>
-  </testcase>
-  <testcase name="getAllTask_WhenNoTasksExist_ReturnEmptyPaginatedResponse" classname="com.romin.task.service.TaskServiceTest$GetAllTaskTests" time="0.071"/>
-  <testcase name="getAllTask_WhenTasksExist_ReturnPaginatedResponse" classname="com.romin.task.service.TaskServiceTest$GetAllTaskTests" time="0.025"/>
-  <testcase name="getTaskById_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.021"/>
-  <testcase name="getTaskById_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.048"/>
-  <testcase name="getTaskById_WhenTaskExists_ReturnsResponseDto" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.025"/>
-  <testcase name="startTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.024">
-    <system-out><![CDATA[21:17:09.630 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: 7cadc3bf-62e6-4a2f-a51a-6032be4a2601
-]]></system-out>
-  </testcase>
-  <testcase name="startTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.026">
-    <system-out><![CDATA[21:17:09.671 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="startTask_WhenTaskExists_StartsTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.028">
-    <system-out><![CDATA[21:17:09.702 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: 165a6fdb-a222-4065-8e16-f6a67102ee59
+  <testcase name="sanityCheck" classname="com.romin.task.repository.TaskRepoTests" time="0.178">
+    <system-out><![CDATA[21:17:10.562 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.romin.task.repository.TaskRepoTests]: TaskRepoTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:17:11.305 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.romin.TaskManagementApplication for test class com.romin.task.repository.TaskRepoTests
+21:17:11.532 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+21:17:11.536 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+21:17:11.554 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 1.21.4
+21:17:12.049 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+21:17:12.836 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+21:17:12.840 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+21:17:12.915 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.6.1
+  API Version: 1.55
+  Operating System: Debian GNU/Linux 12 (bookworm)
+  Total Memory: 6552 MB
+21:17:13.443 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Creating container for image: testcontainers/ryuk:0.12.0
+21:17:13.479 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Failure when attempting to lookup auth config. Please ignore if you don't have images in an authenticated registry. Details: (dockerImageName: testcontainers/ryuk:0.12.0, configFile: /home/alikhan/.docker/config.json, configEnv: DOCKER_AUTH_CONFIG). Falling back to docker-java default behaviour. Exception message: Status 404: No config supplied. Checked in order: /home/alikhan/.docker/config.json (file not found), DOCKER_AUTH_CONFIG (not set)
+21:17:14.153 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 is starting: b70fb120533bdc9ffdb3cca3fe593069b24a6b36a3c9c2a119bae0caff1ff088
+21:17:14.954 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 started in PT1.510609816S
+21:17:14.969 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+21:17:14.969 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+21:17:14.970 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+21:17:14.973 [main] INFO tc.postgres:16 -- Creating container for image: postgres:16
+21:17:15.341 [main] INFO tc.postgres:16 -- Container postgres:16 is starting: 9e727f0cea829cc323c7e0afcb1e8100a8e943e57a3f0fbbe20dfe3440bedcb9
+21:17:21.029 [main] INFO tc.postgres:16 -- Container postgres:16 started in PT6.056124028S
+21:17:21.031 [main] INFO tc.postgres:16 -- Container is started (JDBC URL: jdbc:postgresql://localhost:32807/taskdb?loggerLevel=OFF)
+21:17:21.203 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.16)
+
+2026-07-15T15:47:22.450Z  INFO 7215 --- [           main] c.romin.task.repository.TaskRepoTests    : Starting TaskRepoTests using Java 21.0.10 with PID 7215 (started by alikhan in /home/alikhan/task_management)
+2026-07-15T15:47:22.456Z  INFO 7215 --- [           main] c.romin.task.repository.TaskRepoTests    : No active profile set, falling back to 1 default profile: "default"
+2026-07-15T15:47:24.278Z  INFO 7215 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-15T15:47:24.541Z  INFO 7215 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 237 ms. Found 2 JPA repository interfaces.
+2026-07-15T15:47:26.092Z  INFO 7215 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-07-15T15:47:26.755Z  INFO 7215 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6b32b678
+2026-07-15T15:47:26.759Z  INFO 7215 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-07-15T15:47:26.898Z  INFO 7215 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:32807/taskdb?loggerLevel=OFF (PostgreSQL 16.14)
+2026-07-15T15:47:27.161Z  INFO 7215 --- [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-07-15T15:47:27.191Z  INFO 7215 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.107s)
+2026-07-15T15:47:27.297Z  INFO 7215 --- [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-07-15T15:47:27.611Z  INFO 7215 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-07-15T15:47:27.687Z  INFO 7215 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - init tasks and users tables"
+2026-07-15T15:47:27.796Z  INFO 7215 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - rename assigned fields and add index"
+2026-07-15T15:47:27.840Z  INFO 7215 --- [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 2 migrations to schema "public", now at version v2 (execution time 00:00.086s)
+2026-07-15T15:47:28.485Z  INFO 7215 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-15T15:47:28.784Z  INFO 7215 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.53.Final
+2026-07-15T15:47:28.941Z  INFO 7215 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-07-15T15:47:29.650Z  INFO 7215 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-15T15:47:30.014Z  INFO 7215 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.14
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-15T15:47:32.696Z  INFO 7215 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-15T15:47:32.703Z  INFO 7215 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-15T15:47:33.657Z  INFO 7215 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-15T15:47:35.164Z  INFO 7215 --- [           main] c.romin.task.repository.TaskRepoTests    : Started TaskRepoTests in 14.001 seconds (process running for 32.995)
 ]]></system-out>
   </testcase>
-  <testcase name="updateTask_WhenTaskExists_UpdatesTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.054">
-    <system-out><![CDATA[21:17:09.785 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: ad29a122-3097-4044-95cc-798f33aa2de1
+  <testcase name="showSequences" classname="com.romin.task.repository.TaskRepoTests$Save" time="0.132">
+    <system-out><![CDATA[2026-07-15T15:47:35.464Z  INFO 7215 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.romin.task.repository.TaskRepoTests$Save]: Save does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-15T15:47:35.663Z  INFO 7215 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.romin.TaskManagementApplication for test class com.romin.task.repository.TaskRepoTests$Save
+{sequence_name=user_generator}
+{sequence_name=task_generator}
+{sequence_name=task_human_number_seq}
 ]]></system-out>
   </testcase>
-  <testcase name="updateTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.019">
-    <system-out><![CDATA[21:17:09.811 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: null
+  <testcase name="showFlywayHistory" classname="com.romin.task.repository.TaskRepoTests$Save" time="0.095">
+    <system-out><![CDATA[{installed_rank=1, version=1, description=init tasks and users tables, type=SQL, script=V1__init_tasks_and_users_tables.sql, checksum=517304547, installed_by=taskuser, installed_on=2026-07-15 15:47:27.536148, execution_time=75, success=true}
+{installed_rank=2, version=2, description=rename assigned fields and add index, type=SQL, script=V2__rename_assigned_fields_and_add_index.SQL, checksum=-103338794, installed_by=taskuser, installed_on=2026-07-15 15:47:27.775076, execution_time=11, success=true}
 ]]></system-out>
   </testcase>
-  <testcase name="updateTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.041">
-    <system-out><![CDATA[21:17:09.855 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: 472a6b39-7946-4ffe-bc52-af33de735dce
+  <testcase name="save_WhenTaskIsValid_ShouldPersistSuccessfully" classname="com.romin.task.repository.TaskRepoTests$Save" time="1.544">
+    <system-out><![CDATA[Hibernate: select nextval('user_generator')
+Hibernate: select nextval('user_generator')
+Hibernate: select nextval('task_generator')
+Hibernate: insert into users (user_address,user_identity_number,user_email,name,joining_date,manager_id,phone_number,position,resign_date,role,user_status,id) values (?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into users (user_address,user_identity_number,user_email,name,joining_date,manager_id,phone_number,position,resign_date,role,user_status,id) values (?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into tasks (assigned_by,assigned_to,completion_date,created_at,description,due_date,status,title,updated_at,version,id) values (?,?,?,?,?,?,?,?,?,?,?) returning public_id,task_id
+Hibernate: select t1_0.id,t1_0.assigned_by,t1_0.assigned_to,t1_0.completion_date,t1_0.created_at,t1_0.description,t1_0.due_date,t1_0.public_id,t1_0.status,t1_0.task_id,t1_0.title,t1_0.updated_at,t1_0.version from tasks t1_0 where t1_0.id=?
+]]></system-out>
+  </testcase>
+  <testcase name="showTables" classname="com.romin.task.repository.TaskRepoTests$Save" time="0.053">
+    <system-out><![CDATA[{table_name=flyway_schema_history}
+{table_name=users}
+{table_name=tasks}
 ]]></system-out>
   </testcase>
 </testsuite>

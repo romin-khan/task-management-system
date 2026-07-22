@@ -41,7 +41,7 @@ import com.romin.user.enums.Status;
 import com.romin.user.repository.UserRepo;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceTest {
+class TaskServiceTest {
 
     @Mock
     TaskRepo taskRepo;
@@ -62,7 +62,7 @@ public class TaskServiceTest {
     private UUID id;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         user1 = new User(
             1L,
             "USER-1",
@@ -116,7 +116,7 @@ public class TaskServiceTest {
         );
 
         @Test
-        public void createTask_WhenAssignerAndAssigneeIsPresent_ReturnResponseDto() {
+        void createTask_WhenAssignerAndAssigneeIsPresent_ReturnResponseDto() {
 
             when(userRepo.findById(1L)).thenReturn(Optional.of(user1));
             when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
@@ -136,7 +136,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void throw_WhenAssignerIsNotPresent() {
+        void throw_WhenAssignerIsNotPresent() {
 
             when(userRepo.findById(1L)).thenReturn(Optional.empty());
 
@@ -152,7 +152,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void throw_WhenAssigneeIsNotPresent() {
+        void throw_WhenAssigneeIsNotPresent() {
 
             when(userRepo.findById(1L)).thenReturn(Optional.of(user1));
             when(userRepo.findById(2L)).thenReturn(Optional.empty());
@@ -173,7 +173,7 @@ public class TaskServiceTest {
     class DeleteTaskByPublicIdTests {
 
         @Test
-        public void deleteTask_WhenPassedAValidId() {
+        void deleteTask_WhenPassedAValidId() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
 
@@ -184,7 +184,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void throw_WhenPassedANullId() {
+        void throw_WhenPassedANullId() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -200,7 +200,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void throw_WhenPassedAnInvalidId() {
+        void throw_WhenPassedAnInvalidId() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -230,7 +230,7 @@ public class TaskServiceTest {
         );
 
         @Test
-        public void updateTask_WhenTaskExists_UpdatesTaskAndReturnsResponse() {
+        void updateTask_WhenTaskExists_UpdatesTaskAndReturnsResponse() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
             when(taskMapper.toResponseDto(task)).thenReturn(expectedResponse);
@@ -249,7 +249,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void updateTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
+        void updateTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -266,7 +266,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void updateTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
+        void updateTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -289,7 +289,7 @@ public class TaskServiceTest {
     class CancelTaskTests {
 
         @Test
-        public void cancelTask_WhenTaskExists_CancelsTaskAndReturnsResponse() {
+        void cancelTask_WhenTaskExists_CancelsTaskAndReturnsResponse() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
             when(taskMapper.toResponseDto(task)).thenReturn(expectedResponse);
@@ -304,7 +304,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void cancelTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
+        void cancelTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -321,7 +321,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void cancelTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
+        void cancelTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -344,7 +344,7 @@ public class TaskServiceTest {
     class StartTaskTests {
 
         @Test
-        public void startTask_WhenTaskExists_StartsTaskAndReturnsResponse() {
+        void startTask_WhenTaskExists_StartsTaskAndReturnsResponse() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
             when(taskMapper.toResponseDto(task)).thenReturn(expectedResponse);
@@ -359,7 +359,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void startTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
+        void startTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -376,7 +376,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void startTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
+        void startTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -399,7 +399,7 @@ public class TaskServiceTest {
     class CompleteTaskTests {
 
         @Test
-        public void completeTask_WhenTaskExists_CompletesTaskAndReturnsResponse() {
+        void completeTask_WhenTaskExists_CompletesTaskAndReturnsResponse() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
             when(taskMapper.toResponseDto(task)).thenReturn(expectedResponse);
@@ -414,7 +414,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void completeTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
+        void completeTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -431,7 +431,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void completeTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
+        void completeTask_WhenTaskNotFound_ThrowsTaskNotFoundException() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -454,7 +454,7 @@ public class TaskServiceTest {
     class GetTaskByIdTests {
 
         @Test
-        public void getTaskById_WhenTaskExists_ReturnsResponseDto() {
+        void getTaskById_WhenTaskExists_ReturnsResponseDto() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.of(task));
             when(taskMapper.toResponseDto(task)).thenReturn(expectedResponse);
@@ -468,7 +468,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void getTaskById_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
+        void getTaskById_WhenPublicIdIsNull_ThrowsTaskNotFoundException() {
 
             Exception exception = assertThrows(
                 TaskNotFoundException.class,
@@ -485,7 +485,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void getTaskById_WhenTaskNotFound_ThrowsTaskNotFoundException() {
+        void getTaskById_WhenTaskNotFound_ThrowsTaskNotFoundException() {
 
             when(taskRepo.findByPublicId(id)).thenReturn(Optional.empty());
 
@@ -508,7 +508,7 @@ public class TaskServiceTest {
     class GetAllTaskTests {
 
         @Test
-        public void getAllTask_WhenTasksExist_ReturnPaginatedResponse() {
+        void getAllTask_WhenTasksExist_ReturnPaginatedResponse() {
 
             Pageable pageable = PageRequest.of(0, 5);
 
@@ -539,7 +539,7 @@ public class TaskServiceTest {
         }
 
         @Test
-        public void getAllTask_WhenNoTasksExist_ReturnEmptyPaginatedResponse() {
+        void getAllTask_WhenNoTasksExist_ReturnEmptyPaginatedResponse() {
 
             Pageable pageable = PageRequest.of(0, 5);
             Page<Task> emptyPage = Page.empty(pageable);

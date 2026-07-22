@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.romin.task.service.TaskServiceTest" time="5.136" tests="23" errors="0" skipped="0" failures="0" flakes="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.romin.task.mapper.TaskMapperTest" time="0.043" tests="2" errors="0" skipped="0" failures="0" flakes="0">
   <properties>
     <property name="spring.flyway.enabled" value="true"/>
     <property name="java.specification.version" value="21"/>
@@ -56,87 +56,6 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="cancelTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="3.602">
-    <system-out><![CDATA[21:17:08.311 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: null
-]]></system-out>
-    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-WARNING: A Java agent has been loaded dynamically (/home/alikhan/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar)
-WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
-WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
-WARNING: Dynamic loading of agents will be disallowed by default in a future release
-]]></system-err>
-  </testcase>
-  <testcase name="cancelTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="0.188">
-    <system-out><![CDATA[21:17:08.521 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: 0b00319f-3bbe-4098-8c9d-9ecaa22f212e
-]]></system-out>
-  </testcase>
-  <testcase name="cancelTask_WhenTaskExists_CancelsTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$CancelTaskTests" time="0.078">
-    <system-out><![CDATA[21:17:08.620 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing cancel state transition. Public ID: 08297962-bf31-486c-8b45-411967ed4444
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenTaskExists_CompletesTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.051">
-    <system-out><![CDATA[21:17:08.766 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: 7040b081-225e-4547-87d5-0fcf9698bd61
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.047">
-    <system-out><![CDATA[21:17:08.823 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: a489dfd3-e222-4b11-aa08-173db5857dee
-]]></system-out>
-  </testcase>
-  <testcase name="completeTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$CompleteTaskTests" time="0.041">
-    <system-out><![CDATA[21:17:08.872 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing completion state transition. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenAssigneeIsNotPresent" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.078">
-    <system-out><![CDATA[21:17:08.984 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="createTask_WhenAssignerAndAssigneeIsPresent_ReturnResponseDto" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.061">
-    <system-out><![CDATA[21:17:09.053 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenAssignerIsNotPresent" classname="com.romin.task.service.TaskServiceTest$CreateTaskTests" time="0.042">
-    <system-out><![CDATA[21:17:09.113 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Initiating task creation. AssignedBy: 1, AssignedTo: 2
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenPassedANullId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.06">
-    <system-out><![CDATA[21:17:09.215 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="throw_WhenPassedAnInvalidId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.056">
-    <system-out><![CDATA[21:17:09.270 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: f82d808f-2e92-4e95-b7dd-e0803e08f1b7
-]]></system-out>
-  </testcase>
-  <testcase name="deleteTask_WhenPassedAValidId" classname="com.romin.task.service.TaskServiceTest$DeleteTaskByPublicIdTests" time="0.027">
-    <system-out><![CDATA[21:17:09.311 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Processing delete task command. Public ID: 7de2f53e-2a44-46dd-ad0c-0e111ffa25d9
-]]></system-out>
-  </testcase>
-  <testcase name="getAllTask_WhenNoTasksExist_ReturnEmptyPaginatedResponse" classname="com.romin.task.service.TaskServiceTest$GetAllTaskTests" time="0.071"/>
-  <testcase name="getAllTask_WhenTasksExist_ReturnPaginatedResponse" classname="com.romin.task.service.TaskServiceTest$GetAllTaskTests" time="0.025"/>
-  <testcase name="getTaskById_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.021"/>
-  <testcase name="getTaskById_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.048"/>
-  <testcase name="getTaskById_WhenTaskExists_ReturnsResponseDto" classname="com.romin.task.service.TaskServiceTest$GetTaskByIdTests" time="0.025"/>
-  <testcase name="startTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.024">
-    <system-out><![CDATA[21:17:09.630 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: 7cadc3bf-62e6-4a2f-a51a-6032be4a2601
-]]></system-out>
-  </testcase>
-  <testcase name="startTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.026">
-    <system-out><![CDATA[21:17:09.671 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="startTask_WhenTaskExists_StartsTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$StartTaskTests" time="0.028">
-    <system-out><![CDATA[21:17:09.702 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing start state transition. Public ID: 165a6fdb-a222-4065-8e16-f6a67102ee59
-]]></system-out>
-  </testcase>
-  <testcase name="updateTask_WhenTaskExists_UpdatesTaskAndReturnsResponse" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.054">
-    <system-out><![CDATA[21:17:09.785 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: ad29a122-3097-4044-95cc-798f33aa2de1
-]]></system-out>
-  </testcase>
-  <testcase name="updateTask_WhenPublicIdIsNull_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.019">
-    <system-out><![CDATA[21:17:09.811 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: null
-]]></system-out>
-  </testcase>
-  <testcase name="updateTask_WhenTaskNotFound_ThrowsTaskNotFoundException" classname="com.romin.task.service.TaskServiceTest$UpdateTaskTests" time="0.041">
-    <system-out><![CDATA[21:17:09.855 [main] INFO com.romin.task.service.TaskService -- [SERVICE] Executing partial update transaction. Public ID: 472a6b39-7946-4ffe-bc52-af33de735dce
-]]></system-out>
-  </testcase>
+  <testcase name="toEntity_WhenPassedValidRequestAndUsers_ShouldReturnMappedTask" classname="com.romin.task.mapper.TaskMapperTest" time="0.008"/>
+  <testcase name="toResponse_WhenPassedValidEntity_ShouldReturnResponseDto" classname="com.romin.task.mapper.TaskMapperTest" time="0.014"/>
 </testsuite>

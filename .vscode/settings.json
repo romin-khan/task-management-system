@@ -1,7 +1,11 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.compile.nullAnalysis.mode": "automatic",
+    "java.server.launchMode": "Standard",
     "cSpell.words": [
-        "Adoptium"
+        "Adoptium",
+        "taskdb",
+        "taskpass",
+        "taskuser"
     ]
 }
