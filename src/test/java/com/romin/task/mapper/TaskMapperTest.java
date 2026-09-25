@@ -2,6 +2,7 @@ package com.romin.task.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ class TaskMapperTest{
     
     @Test
     void toEntity_WhenPassedValidRequestAndUsers_ShouldReturnMappedTask(){
-        LocalDate dueDate = LocalDate.now();
+        Instant dueDate = Instant.now();
         TaskRequestDto request = new TaskRequestDto(
             "Title",
             "Description",
@@ -86,7 +87,7 @@ class TaskMapperTest{
 
     @Test
     void toResponse_WhenPassedValidEntity_ShouldReturnResponseDto(){
-        LocalDate dueDate = LocalDate.now();
+        Instant dueDate = Instant.now();
         Task task = new Task(
             "Title",
             "Description",

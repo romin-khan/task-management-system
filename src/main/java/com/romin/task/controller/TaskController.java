@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.TaskRequestDto;
+import com.romin.task.dto.request.TaskSearchRequest;
 import com.romin.task.dto.request.UpdateRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.service.TaskService;
@@ -23,9 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
 
 @Slf4j
 @RestController
@@ -88,7 +91,10 @@ public class TaskController {
                                             @PageableDefault(size = 5, sort = "dueDate") Pageable pageable){
         log.info("[HTTP GET] Incoming get all task request received. Parameters: page={}, size={}, sort={}", 
                  pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        validateSortProperties(pageable.getSort());
+                 
+        if (pageable.getSort().isEmpty()) {
+            validateSortProperties(pageable.getSort());        
+        }         
 
         PaginatedResponse<TaskResponseDto> response = taskService.getAllTask(pageable);
         log.info("[HTTP 200] All tasks fetched successfully. Total Count: {}", response.totalElements());
@@ -112,6 +118,24 @@ public class TaskController {
         log.info("[HTTP 200] Task completed successfully. Public ID: {}", publicId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<PaginatedResponse<TaskResponseDto>> searchTasks(
+                                            @ModelAttribute TaskSearchRequest request,
+                                            @PageableDefault(size = 5, sort = "createdAt") Pageable pageable){
+        log.info("[HTTP GET] Incoming search task request received. Parameters: {}", request);
+        if (request == null) {
+            log.warn("[HTTP 400] Search request parameters are missing.");
+            return ResponseEntity.badRequest().build();
+        }
+        if(!pageable.getSort().isEmpty()) {
+            validateSortProperties(pageable.getSort());
+        }
+        PaginatedResponse<TaskResponseDto> response = taskService.searchTasks(request, pageable);
+        log.info("[HTTP 200] Task search completed successfully. Total Count: {}", response.totalElements());
+        return ResponseEntity.ok(response);
+    }
+    
 
     private void validateSortProperties(Sort sort) {
         Set<String> validFields = Set.of("title", "status", "assignedBy", "assignedTo", "createdAt", "completionDate", "dueDate");

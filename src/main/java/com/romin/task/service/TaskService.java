@@ -4,17 +4,20 @@ import java.util.UUID;
 
 import com.romin.infra.dto.PaginatedResponse;
 import com.romin.task.dto.request.TaskRequestDto;
+import com.romin.task.dto.request.TaskSearchRequest;
 import com.romin.task.dto.request.UpdateRequestDto;
 import com.romin.task.dto.response.TaskResponseDto;
 import com.romin.task.entity.Task;
 import com.romin.task.exception.TaskNotFoundException;
 import com.romin.task.mapper.TaskMapper;
 import com.romin.task.repository.TaskRepo;
+import com.romin.task.repository.TaskSpecification;
 import com.romin.user.entity.User;
 import com.romin.user.repository.UserRepo;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,11 +105,36 @@ public class TaskService {
         return PaginatedResponse.from(response);
     }
 
+    public PaginatedResponse<TaskResponseDto> searchTasks(TaskSearchRequest request, Pageable pageable) {
+        log.info("[SERVICE] Executing search query with parameters: {}", request);
+        Specification<Task> specification = buildTaskSpecification(request);
+        Page<TaskResponseDto> response = taskRepo.findAll(specification, pageable).map(taskMapper::toResponseDto);
+        return PaginatedResponse.from(response);
+    }
+
     private Task getTaskOrThrow(UUID publicId) {
         if (publicId == null) {
             throw new TaskNotFoundException("Task cannot be found because the provided ID is null");
         }
         return taskRepo.findByPublicId(publicId)
             .orElseThrow(() -> new TaskNotFoundException("Task having id = " + publicId + " not found"));
+    }
+
+    private Specification<Task> buildTaskSpecification(TaskSearchRequest request) {
+        return Specification.allOf(
+            TaskSpecification.hasStatus(request.status()),
+            TaskSpecification.hasAssignedTo(request.assignedToUserID()),
+            TaskSpecification.hasAssignedBy(request.assignedByUserID()),
+            TaskSpecification.hasTitle(request.title()),
+            TaskSpecification.hasDescription(request.description()),
+            TaskSpecification.hasDueDate(request.dueAt()),
+            TaskSpecification.hasDueDateBefore(request.dueBefore()),
+            TaskSpecification.hasDueDateAfter(request.dueAfter()),
+            TaskSpecification.hasDueDateBetween(request.dueFrom(), request.dueTo()),
+            TaskSpecification.hasCompletionDate(request.completedAt()),
+            TaskSpecification.hasCompletionDateBefore(request.completedBefore()),
+            TaskSpecification.hasCompletionDateAfter(request.completedAfter()),
+            TaskSpecification.hasCompletionDateBetween(request.completedFrom(), request.completedTo())
+        );
     }
 }

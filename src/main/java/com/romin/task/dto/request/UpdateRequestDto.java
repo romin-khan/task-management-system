@@ -1,6 +1,6 @@
 package com.romin.task.dto.request;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
@@ -14,5 +14,5 @@ public record UpdateRequestDto(
     String description,
 
     @FutureOrPresent(message = "Extended due date must be in the present or future.")
-    LocalDate dueDate
+    Instant dueDate
 ){}

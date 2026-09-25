@@ -6,15 +6,14 @@ import com.romin.task.entity.Task;
 import com.romin.task.entity.TaskStatus;
 import com.romin.user.entity.User;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-08-25T01:14:07+0530",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
+    date = "2026-09-26T03:24:01+0530",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.100.v20260826-1225, environment: Java 21.0.12.1 (Eclipse Adoptium)"
 )
 @Component
 public class TaskMapperImpl implements TaskMapper {
@@ -34,7 +33,7 @@ public class TaskMapperImpl implements TaskMapper {
         TaskStatus status = null;
         Instant createdAt = null;
         Instant updatedAt = null;
-        LocalDate dueDate = null;
+        Instant dueDate = null;
         Instant completionDate = null;
 
         assignedBy = taskAssignedById( task );
@@ -62,7 +61,7 @@ public class TaskMapperImpl implements TaskMapper {
 
         String title = null;
         String description = null;
-        LocalDate dueDate = null;
+        Instant dueDate = null;
         if ( request != null ) {
             title = request.title();
             description = request.description();

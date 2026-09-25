@@ -1,5 +1,6 @@
 package com.romin.user.entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,10 +146,10 @@ public class User {
         name = "joining_date",
         nullable = false
     )
-    private LocalDate joinDate;
+    private Instant joinDate;
 
     @Column(name = "resign_date")
-    private LocalDate resignDate;
+    private Instant resignDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

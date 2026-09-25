@@ -1,6 +1,6 @@
 package com.romin.task.dto.request;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -22,5 +22,5 @@ public record TaskRequestDto(
 
     @NotNull(message = "Due date should have some value")
     @FutureOrPresent(message = "Due date should be in present or future")
-    LocalDate dueDate
+    Instant dueDate
 ){}

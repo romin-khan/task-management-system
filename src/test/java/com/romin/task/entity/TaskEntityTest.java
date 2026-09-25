@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,14 +26,14 @@ class TaskEntityTest{
     private Task task;
     private String title;
     private String description;
-    private LocalDate dueDate;
+    private Instant dueDate;
 
     @BeforeEach
     void setUp() {
 
         title = "Bug fix";
         description = "Fix DB Indexing";
-        dueDate = LocalDate.now();
+        dueDate = Instant.now();
 
         user1 = new User(
             1L,"USER-1","Romin",
@@ -70,7 +71,7 @@ class TaskEntityTest{
 
         @Test
         void update_WhenPassedAllValidFields_ShouldUpdateSuccessfully(){
-            LocalDate updatedDueDate = LocalDate.now().plusDays(5);
+            Instant updatedDueDate = Instant.now().plus(5, ChronoUnit.DAYS);
 
             task.update(
                 " Take interview ",
@@ -94,7 +95,7 @@ class TaskEntityTest{
         void update_WhenTaskIsCancelled_ShouldThrowException(){
             task.cancel();
 
-            LocalDate futureDate = LocalDate.now().plusDays(5);
+            Instant futureDate = Instant.now().plus(5, ChronoUnit.DAYS);
             Exception exception = assertThrows(
                 IllegalStateException.class,
                 () -> task.update("New Title", "New Description", futureDate)
@@ -108,7 +109,7 @@ class TaskEntityTest{
         void update_WhenTaskIsCompleted_ShouldThrowException(){
             task.complete();
 
-            LocalDate futureDate = LocalDate.now().plusDays(5);
+            Instant futureDate = Instant.now().plus(5, ChronoUnit.DAYS);
             Exception exception = assertThrows(
                 IllegalStateException.class,
                 () -> task.update("New Title", "New Description", futureDate)
@@ -132,7 +133,7 @@ class TaskEntityTest{
         @Test
         void updateTitle_WhenPassedValidTitle_ShouldUpdateSuccessfully(){
             String expectedDescription = task.getDescription();
-            LocalDate expectedDueDate = task.getDueDate();
+            Instant expectedDueDate = task.getDueDate();
 
             task.update(" New Title   ", null, null);
 
@@ -180,7 +181,7 @@ class TaskEntityTest{
         @Test
         void updateDescription_WhenPassedValidDescription_ShouldUpdateSuccessfully(){
             String expectedTitle = task.getTitle();
-            LocalDate expectedDueDate = task.getDueDate();
+            Instant expectedDueDate = task.getDueDate();
 
             task.update(null, "  New Description ", null);
 
@@ -203,7 +204,7 @@ class TaskEntityTest{
 
         @Test
         void update_WhenPassedInvalidDueDate_ShouldThrowException(){
-            LocalDate futureDate = LocalDate.now().minusDays(3);
+            Instant futureDate = Instant.now().minus(3, ChronoUnit.DAYS);
             Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> task.update(null, null, futureDate
@@ -217,7 +218,7 @@ class TaskEntityTest{
         void updateDueDate_WhenPassedValidDueDate_ShouldUpdateSuccessfully(){
             String expectedTitle = task.getTitle();
             String expectedDescription = task.getDescription();
-            LocalDate expectedDueDate = LocalDate.now().plusDays(5);
+            Instant expectedDueDate = Instant.now().plus(5, ChronoUnit.DAYS);
 
             task.update(null, null, expectedDueDate);
 

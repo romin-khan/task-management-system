@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -72,7 +74,8 @@ class TaskRepoTests {
     private User user1;
     private User user2;
     private Task globalTask;
-    private static final LocalDate DUE_DATE = LocalDate.of(2026, Month.JULY, 17);
+    private static final Instant DUE_DATE = LocalDate.of(2026, Month.JULY, 17)
+                                                     .atStartOfDay(ZoneId.of("UTC")).toInstant();
 
     @BeforeAll
     static void beforeAll() {
@@ -193,7 +196,7 @@ class TaskRepoTests {
             managedTask.update(
                     "Updated Title",
                     "Updated Description",
-                    LocalDate.now().plusDays(5)
+                    Instant.now().plus(5, ChronoUnit.DAYS)
             );
 
             taskRepo.saveAndFlush(managedTask);
@@ -204,7 +207,7 @@ class TaskRepoTests {
 
             assertEquals("Updated Title", updated.getTitle());
             assertEquals("Updated Description", updated.getDescription());
-            assertEquals(LocalDate.now().plusDays(5), updated.getDueDate());
+            assertEquals(Instant.now().plus(5, ChronoUnit.DAYS), updated.getDueDate());
             assertEquals(1L, updated.getVersion());
             assertNotEquals(updatedDate, updated.getUpdatedAt());
         }
@@ -275,7 +278,7 @@ class TaskRepoTests {
                         "Description " + i,
                         assigner,
                         assignee,
-                        DUE_DATE.plusDays(i)
+                        DUE_DATE.plus(i, ChronoUnit.DAYS)
                 ));
             }
 
@@ -373,7 +376,7 @@ class TaskRepoTests {
                             "Description 2",
                             user1,
                             user2,
-                            DUE_DATE.plusDays(1)
+                            DUE_DATE.plus(1, ChronoUnit.DAYS)
                     )
             );
 

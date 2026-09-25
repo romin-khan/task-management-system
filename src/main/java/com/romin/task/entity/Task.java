@@ -1,8 +1,6 @@
 package com.romin.task.entity;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.hibernate.annotations.Generated;
@@ -77,9 +75,9 @@ public class Task extends BaseAuditEntity {
     private Instant completionDate;
 
     @Column(name = "due_date", nullable = false)
-    private LocalDate dueDate;
+    private Instant dueDate;
 
-    public Task(String title, String description, User assignedBy, User assignedTo, LocalDate dueDate) {
+    public Task(String title, String description, User assignedBy, User assignedTo, Instant dueDate) {
 
         if (title == null || title.trim().length() < 3) throw new IllegalArgumentException("Invalid title.");
         if (description == null || description.trim().length() < 5) throw new IllegalArgumentException("Invalid description.");
@@ -99,7 +97,7 @@ public class Task extends BaseAuditEntity {
         log.debug("[DB-LIFECYCLE] Persisting Task Aggregate: {}", this.taskId);
     }
 
-    public void update(String newTitle, String newDescription, LocalDate newDueDate) {
+    public void update(String newTitle, String newDescription, Instant newDueDate) {
         
         ensureTaskIsModifiable();
         
@@ -121,7 +119,7 @@ public class Task extends BaseAuditEntity {
         }
         
         if (newDueDate != null) {
-            if (newDueDate.isBefore(LocalDate.now(ZoneOffset.UTC))) {
+            if (newDueDate.isBefore(dueDate)) {
                 throw new IllegalArgumentException("New due date cannot be earlier than the current date.");
             }
             this.dueDate = newDueDate;

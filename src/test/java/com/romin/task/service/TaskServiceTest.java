@@ -9,7 +9,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -112,7 +114,7 @@ class TaskServiceTest {
             "Make test on service",
             1L,
             2L,
-            LocalDate.now().plusDays(2)
+            Instant.now().plus(2, ChronoUnit.DAYS)
         );
 
         @Test
@@ -215,7 +217,7 @@ class TaskServiceTest {
             );
 
             verify(taskRepo).findByPublicId(id);
-            verify(taskRepo, never()).delete(any());
+            verify(taskRepo, never()).delete(any(Task.class));
             verifyNoInteractions(taskMapper);
         }
     }
@@ -226,7 +228,7 @@ class TaskServiceTest {
         final UpdateRequestDto request = new UpdateRequestDto(
             "fix bug",
             "there is bug in redis instead of kafka",
-            LocalDate.now()
+            Instant.now()
         );
 
         @Test
